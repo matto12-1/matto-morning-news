@@ -10,7 +10,7 @@
   --accent: #f4b740;     /* 따뜻한 노랑 */
   --good: #2f855a;
   --bad: #c53030;
-  --sci: #2b8a9c; --his: #b7791f; --lit: #7c4dbe; --lan: #d1462f;
+  --sci: #1d6b7a; --his: #835500; --lit: #7c4dbe; --lan: #d1462f;
   --r: 16px;
   --shadow: 0 6px 18px rgba(60, 45, 20, .10);
   --serif: Georgia, "Nanum Myeongjo", "Apple SD Gothic Neo", serif;
@@ -80,7 +80,7 @@ body {
 .glossary h3 { margin: 0 0 8px; font-size: 1.05rem; }
 .glossary dl { margin: 0; display: grid; gap: 6px; }
 .gloss-row { display: flex; gap: 8px; align-items: baseline; }
-.gloss-row dt { flex: 0 0 auto; font-weight: 800; color: var(--brand); background: #ffe9a8; border-radius: 6px; padding: 1px 8px; }
+.gloss-row dt { flex: 0 0 auto; font-weight: 800; color: #9a2e1a; background: #ffe9a8; border-radius: 6px; padding: 1px 8px; }
 .gloss-row dd { margin: 0; color: var(--ink-soft); }
 
 /* 어휘 낱말 */
