@@ -1,5 +1,5 @@
-// assets/render.js — 홈(제호·헤드라인·본문·어휘 툴팁) 렌더.
-import { SITE_NAME, SITE_TAGLINE, CATEGORY_LABELS, CATEGORY_EMOJI, LEVELS } from "./config.js";
+// assets/render.js — 에디토리얼(잡지) 홈 렌더: 제호·키커·데크·메타바·드롭캡·발췌 인용·낱말풀이.
+import { SITE_NAME, SITE_TAGLINE, CATEGORY_LABELS, LEVELS } from "./config.js";
 
 const escapeHtml = (s) =>
   String(s).replace(/[&<>"']/g, (c) =>
@@ -14,71 +14,75 @@ export function formatDate(iso) {
   return `${y}년 ${m}월 ${d}일 ${wd}요일`;
 }
 
-// 본문 텍스트를 문단 <p>로, 어휘 낱말은 <button.vocab>로 감싸 반환(HTML 문자열).
-export function renderBody(text, vocab = []) {
+// 본문 텍스트를 문단별 <p> 배열로. 어휘 낱말은 <button.vocab>로 감싼다.
+export function renderParagraphs(text, vocab = []) {
   const words = vocab.map((v) => v.word).filter(Boolean).sort((a, b) => b.length - a.length);
-  const paras = String(text).split(/\n\n+/);
   const re = words.length ? new RegExp("(" + words.map(escapeReg).join("|") + ")", "g") : null;
-  return paras
-    .map((p) => {
-      if (!re) return `<p>${escapeHtml(p)}</p>`;
-      let html = "", last = 0, m;
-      re.lastIndex = 0;
-      while ((m = re.exec(p))) {
-        html += escapeHtml(p.slice(last, m.index));
-        const w = m[1];
-        html += `<button type="button" class="vocab" data-word="${escapeHtml(w)}" aria-label="낱말 뜻 보기: ${escapeHtml(w)}">${escapeHtml(w)}</button>`;
-        last = m.index + w.length;
-      }
-      html += escapeHtml(p.slice(last));
-      return `<p>${html}</p>`;
-    })
-    .join("");
+  return String(text).split(/\n\n+/).map((p) => {
+    if (!re) return `<p>${escapeHtml(p)}</p>`;
+    let html = "", last = 0, m;
+    re.lastIndex = 0;
+    while ((m = re.exec(p))) {
+      html += escapeHtml(p.slice(last, m.index));
+      const w = m[1];
+      html += `<button type="button" class="vocab" data-word="${escapeHtml(w)}" aria-label="낱말 뜻 보기: ${escapeHtml(w)}">${escapeHtml(w)}</button>`;
+      last = m.index + w.length;
+    }
+    html += escapeHtml(p.slice(last));
+    return `<p>${html}</p>`;
+  });
 }
 
-// 홈 뷰 엘리먼트 생성. handlers: {onStartQuiz, onPrint, onLevelChange}
+// 호환용: 문단을 이어붙인 문자열.
+export function renderBody(text, vocab = []) {
+  return renderParagraphs(text, vocab).join("");
+}
+
 export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   const el = document.createElement("article");
-  el.className = "paper";
+  el.className = `paper cat-${article.category}`;
   const cat = article.category;
-  const bodyText = article.body[level];
   const rt = article.readingTimeMin?.[level];
+
+  // 본문 + 발췌 인용(pullquote) 삽입(첫 문단 뒤).
+  const paras = renderParagraphs(article.body[level], article.vocab);
+  if (article.pullquote && paras.length >= 2) {
+    paras.splice(1, 0, `<blockquote class="pullquote"><span>“</span>${escapeHtml(article.pullquote)}</blockquote>`);
+  }
 
   el.innerHTML = `
     <header class="masthead">
-      <p class="masthead-tagline">${escapeHtml(SITE_TAGLINE)}</p>
-      <h1 class="masthead-title">${escapeHtml(SITE_NAME)}</h1>
-      <div class="masthead-meta">
-        <span>${escapeHtml(formatDate(article.date))}</span>
-        <span class="dot">·</span>
-        <span>제 ${article.issueNo} 호</span>
+      <div class="masthead-top">
+        <span>${escapeHtml(SITE_TAGLINE)}</span>
+        <span>초등 문해력 신문</span>
       </div>
+      <h1 class="nameplate">${escapeHtml(SITE_NAME)}</h1>
+      <div class="masthead-rule"><span>${escapeHtml(formatDate(article.date))}</span><span>제 ${article.issueNo} 호</span></div>
     </header>
 
-    <div class="toolbar" role="toolbar" aria-label="읽기 도구">
+    <nav class="toolbar" aria-label="읽기 도구">
       <div class="level-toggle" role="group" aria-label="학년 선택">
-        <button type="button" class="lvl" data-level="lower" aria-pressed="${level === "lower"}">
-          ${LEVELS.lower.label} <small>${LEVELS.lower.sub}</small>
-        </button>
-        <button type="button" class="lvl" data-level="upper" aria-pressed="${level === "upper"}">
-          ${LEVELS.upper.label} <small>${LEVELS.upper.sub}</small>
-        </button>
+        <button type="button" class="lvl" data-level="lower" aria-pressed="${level === "lower"}">${LEVELS.lower.label}</button>
+        <button type="button" class="lvl" data-level="upper" aria-pressed="${level === "upper"}">${LEVELS.upper.label}</button>
       </div>
       <div class="toolbar-right">
-        <button type="button" class="btn ghost" id="tts-btn" hidden>🔊 읽어주기</button>
-        <button type="button" class="btn ghost" id="font-btn" aria-pressed="false">🔎 큰 글씨</button>
-        <button type="button" class="btn ghost" id="print-btn">🖨️ 인쇄</button>
+        <button type="button" class="tbtn" id="tts-btn" hidden>🔊 읽어주기</button>
+        <button type="button" class="tbtn" id="font-btn" aria-pressed="false">가<span aria-hidden="true">＋</span> 큰 글씨</button>
+        <button type="button" class="tbtn" id="print-btn">🖨 인쇄</button>
       </div>
-    </div>
+    </nav>
 
     <div class="article">
-      <p class="cat-badge cat-${cat}">${CATEGORY_EMOJI[cat] || "📰"} ${escapeHtml(CATEGORY_LABELS[cat] || "")}</p>
+      <p class="kicker">${escapeHtml(CATEGORY_LABELS[cat] || "")}</p>
       <h2 class="headline">${escapeHtml(article.title)}</h2>
-      <p class="subhead">${escapeHtml(article.subtitle)}</p>
-      ${rt ? `<p class="readtime">📖 약 ${rt}분이면 읽어요</p>` : ""}
-      <div class="body" id="article-body">${renderBody(bodyText, article.vocab)}</div>
+      <p class="deck">${escapeHtml(article.subtitle)}</p>
+      <div class="byline">
+        <span class="byline-level">${LEVELS[level].label} · ${LEVELS[level].sub}</span>
+        ${rt ? `<span class="byline-time">읽기 ${rt}분</span>` : ""}
+      </div>
+      <div class="body" id="article-body">${paras.join("")}</div>
       <aside class="glossary" aria-label="오늘의 낱말">
-        <h3>📚 오늘의 낱말</h3>
+        <p class="glossary-label">낱말 풀이</p>
         <dl>
           ${(article.vocab || []).map((v) =>
             `<div class="gloss-row"><dt>${escapeHtml(v.word)}</dt><dd>${escapeHtml(v.meaning)}</dd></div>`
@@ -88,20 +92,16 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
     </div>
 
     <div class="cta">
-      <button type="button" class="btn primary big" id="start-quiz">오늘의 퀴즈 풀기 →</button>
+      <button type="button" class="btn primary big" id="start-quiz">오늘의 문제 풀기 →</button>
     </div>
   `;
 
-  // 어휘 툴팁 마운트
   mountVocabTooltips(el, article.vocab);
-
-  // 이벤트
   el.querySelectorAll(".lvl").forEach((b) =>
     b.addEventListener("click", () => handlers.onLevelChange?.(b.dataset.level))
   );
   el.querySelector("#start-quiz").addEventListener("click", () => handlers.onStartQuiz?.());
   el.querySelector("#print-btn").addEventListener("click", () => handlers.onPrint?.());
-
   return el;
 }
 
@@ -109,7 +109,6 @@ export function mountVocabTooltips(root, vocab = []) {
   const map = new Map(vocab.map((v) => [v.word, v.meaning]));
   let openTip = null;
   const close = () => { if (openTip) { openTip.remove(); openTip = null; } };
-
   root.addEventListener("click", (e) => {
     const btn = e.target.closest(".vocab");
     if (!btn) { close(); return; }

@@ -18,6 +18,7 @@
 - **두 난이도:** `body.lower`(3~4학년, 200~350자, 짧고 쉬운 문장) / `body.upper`(5~6학년, 350~600자, 인과·배경 포함).
 - **어조:** 다정하고 호기심을 돋우는 말투. 질문으로 시작해 궁금하게.
 - **어휘 3~5개**(본문에 실제 등장), **내용 문항 3~4개**(mc/ox), **어휘 문항 2~3개**(meaning/cloze), **생각 넓히기 1개**.
+- **`pullquote`**(발췌 인용): 기사에서 가장 핵심적인 한 문장을 잡지처럼 뽑아 한 줄로. 본문 첫 문단 뒤에 크게 표시됨.
 
 ## 스키마 (필드 요약 — 정본은 스펙 §5.1)
 ```json
@@ -25,6 +26,7 @@
   "date": "YYYY-MM-DD", "issueNo": N,
   "category": "science|history|literature|language", "categoryLabel": "…",
   "title": "…", "subtitle": "…",
+  "pullquote": "핵심 한 문장",
   "readingTimeMin": { "lower": 2, "upper": 3 },
   "body": { "lower": "…\n\n…", "upper": "…\n\n…" },
   "vocab": [ { "word": "…", "meaning": "…" } ],
