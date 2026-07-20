@@ -1,0 +1,12 @@
+{
+  "name": "morning-paper",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "초등 3~6학년 데일리 문해력 신문 (오늘의 아침신문)",
+  "scripts": {
+    "test": "node --test tools/validate.test.mjs tools/quiz.test.mjs tools/content.test.mjs",
+    "serve": "node serve.mjs",
+    "validate": "node tools/validate.mjs"
+  }
+}
