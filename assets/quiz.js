@@ -197,6 +197,23 @@ export function renderQuiz(article, { level, onBack } = {}) {
     const el = document.createElement("div");
     el.className = "quiz-section bonus";
     el.innerHTML = `<h3>🎁 보너스</h3><p class="q-text">${escapeHtml(bonus.question || "")}</p>`;
+    if (bonus.type === "match" && Array.isArray(bonus.pairs)) {
+      const ul = document.createElement("ul");
+      ul.className = "bonus-pairs";
+      bonus.pairs.forEach((p) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span class="bp-left">${escapeHtml(p.left)}</span><span class="bp-arrow" hidden> → ${escapeHtml(p.right)}</span>`;
+        ul.appendChild(li);
+      });
+      const toggle = button("정답 확인하기 👀", "btn ghost small");
+      toggle.addEventListener("click", () => {
+        const arrows = ul.querySelectorAll(".bp-arrow");
+        const show = arrows[0] && arrows[0].hidden;
+        arrows.forEach((a) => { a.hidden = !show; });
+        toggle.textContent = show ? "닫기" : "정답 확인하기 👀";
+      });
+      el.append(ul, toggle);
+    }
     return el;
   }
 }
