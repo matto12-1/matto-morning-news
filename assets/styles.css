@@ -75,6 +75,14 @@ body {
 .body p { margin: 0 0 1.05em; }
 .body p:first-letter { }
 
+/* 오늘의 낱말 글로서리 */
+.glossary { margin: 20px 0 4px; background: #fff; border: 2px dashed var(--accent); border-radius: var(--r); padding: 14px 16px; }
+.glossary h3 { margin: 0 0 8px; font-size: 1.05rem; }
+.glossary dl { margin: 0; display: grid; gap: 6px; }
+.gloss-row { display: flex; gap: 8px; align-items: baseline; }
+.gloss-row dt { flex: 0 0 auto; font-weight: 800; color: var(--brand); background: #ffe9a8; border-radius: 6px; padding: 1px 8px; }
+.gloss-row dd { margin: 0; color: var(--ink-soft); }
+
 /* 어휘 낱말 */
 .vocab {
   border: 0; background: linear-gradient(transparent 62%, #ffe9a8 62%); color: inherit; font: inherit;
@@ -101,7 +109,11 @@ body {
 
 /* ── 퀴즈 ── */
 .quiz { padding: 4px 2px; }
-.quiz-title { font-family: var(--serif); font-size: 1.8rem; text-align: center; margin: 8px 0 18px; }
+.quiz-title { font-family: var(--serif); font-size: 1.8rem; text-align: center; margin: 8px 0 12px; }
+.quiz-progress { display: flex; align-items: center; gap: 10px; margin: 0 0 18px; }
+.qp-bar { flex: 1; height: 12px; background: #efe6d4; border-radius: 999px; overflow: hidden; }
+.qp-fill { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--brand)); border-radius: 999px; transition: width .35s ease; }
+.qp-label { font-size: .85rem; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }
 .quiz-section { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 16px 18px; margin: 0 0 16px; box-shadow: var(--shadow); }
 .quiz-section h3 { margin: 0 0 12px; font-size: 1.15rem; }
 .q-item { padding: 10px 0; border-top: 1px dashed var(--line); }

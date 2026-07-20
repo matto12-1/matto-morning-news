@@ -30,13 +30,25 @@ export function renderQuiz(article, { level, onBack } = {}) {
   const q = article.quiz;
   const root = document.createElement("section");
   root.className = "quiz";
-  root.innerHTML = `<h2 class="quiz-title">📝 오늘의 퀴즈</h2>`;
+  root.innerHTML = `<h2 class="quiz-title">📝 오늘의 퀴즈</h2>
+    <div class="quiz-progress" role="status" aria-live="polite">
+      <div class="qp-bar"><span class="qp-fill" style="width:0%"></span></div>
+      <span class="qp-label">0 / ${q.comprehension.length + q.vocab.length} 문제</span>
+    </div>`;
 
-  const state = { comp: {}, voc: {}, revealedThink: false };
+  const state = { comp: {}, voc: {} };
+  const totalGraded = q.comprehension.length + q.vocab.length;
+  const updateProgress = () => {
+    const done = Object.keys(state.comp).length + Object.keys(state.voc).length;
+    const pct = totalGraded ? Math.round((done / totalGraded) * 100) : 0;
+    const fill = root.querySelector(".qp-fill");
+    const label = root.querySelector(".qp-label");
+    if (fill) fill.style.width = pct + "%";
+    if (label) label.textContent = `${done} / ${totalGraded} 문제`;
+  };
 
-  // 진행 상태(세션 한정, 저장 없음)
-  const compBlock = buildSection("내용 이해", q.comprehension, state.comp, "comp");
-  const vocBlock = buildSection("어휘", q.vocab, state.voc, "voc");
+  const compBlock = buildSection("내용 이해", q.comprehension, state.comp, "comp", updateProgress);
+  const vocBlock = buildSection("어휘", q.vocab, state.voc, "voc", updateProgress);
   root.appendChild(compBlock.el);
   root.appendChild(vocBlock.el);
   root.appendChild(buildThink(q.think));
@@ -82,17 +94,17 @@ export function renderQuiz(article, { level, onBack } = {}) {
   return root;
 
   // ── 내부 헬퍼 ──
-  function buildSection(titleText, items, answerStore, ns) {
+  function buildSection(titleText, items, answerStore, ns, notify) {
     const el = document.createElement("div");
     el.className = "quiz-section";
     el.innerHTML = `<h3>${titleText}</h3>`;
     items.forEach((item, i) => {
-      el.appendChild(buildItem(item, i, answerStore, ns));
+      el.appendChild(buildItem(item, i, answerStore, ns, notify));
     });
     return { el };
   }
 
-  function buildItem(item, i, answerStore, ns) {
+  function buildItem(item, i, answerStore, ns, notify) {
     const wrap = document.createElement("div");
     wrap.className = "q-item";
     wrap.innerHTML = `<p class="q-text"><span class="q-num">${i + 1}</span> ${escapeHtml(item.question)}</p>`;
@@ -103,6 +115,7 @@ export function renderQuiz(article, { level, onBack } = {}) {
     const settle = (ok) => {
       feedback.textContent = (ok ? "정답이에요! " : "다시 생각해볼까요? ") + (item.explain || "");
       feedback.className = "q-feedback " + (ok ? "ok" : "no");
+      notify?.();
     };
 
     if (item.type === "mc" || item.type === "meaning") {

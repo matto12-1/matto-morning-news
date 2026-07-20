@@ -77,6 +77,14 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
       <p class="subhead">${escapeHtml(article.subtitle)}</p>
       ${rt ? `<p class="readtime">📖 약 ${rt}분이면 읽어요</p>` : ""}
       <div class="body" id="article-body">${renderBody(bodyText, article.vocab)}</div>
+      <aside class="glossary" aria-label="오늘의 낱말">
+        <h3>📚 오늘의 낱말</h3>
+        <dl>
+          ${(article.vocab || []).map((v) =>
+            `<div class="gloss-row"><dt>${escapeHtml(v.word)}</dt><dd>${escapeHtml(v.meaning)}</dd></div>`
+          ).join("")}
+        </dl>
+      </aside>
     </div>
 
     <div class="cta">
