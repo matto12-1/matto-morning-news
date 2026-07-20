@@ -41,6 +41,8 @@ function render() {
       })
     );
     window.scrollTo({ top: 0, behavior: "smooth" });
+    focusMain(".quiz-title");
+    state.booted = true;
     return;
   }
 
@@ -55,6 +57,15 @@ function render() {
   app.appendChild(home);
   wireTts(home);
   wireFontToggle(home);
+  focusMain(".headline");
+  state.booted = true;
+}
+
+// 뷰 전환 시 주요 제목으로 포커스 이동(초기 로딩 때는 제외).
+function focusMain(sel) {
+  if (!state.booted) return;
+  const el = app.querySelector(sel);
+  if (el) { el.tabIndex = -1; el.focus({ preventScroll: true }); }
 }
 
 function wireTts(root) {

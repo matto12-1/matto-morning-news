@@ -33,7 +33,10 @@ export function openPrintDialog(article, defaultLevel = "lower") {
       </div>
     </div>`;
   document.body.appendChild(back);
-  const close = () => back.remove();
+  function onKey(e) { if (e.key === "Escape") close(); }
+  function close() { back.remove(); document.removeEventListener("keydown", onKey); }
+  document.addEventListener("keydown", onKey);
+  back.querySelector("#pr-level")?.focus();
   back.addEventListener("click", (e) => { if (e.target === back) close(); });
   back.querySelector("#pr-cancel").addEventListener("click", close);
   back.querySelector("#pr-go").addEventListener("click", () => {
