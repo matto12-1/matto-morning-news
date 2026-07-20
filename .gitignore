@@ -3,3 +3,4 @@ node_modules/
 .claude/ralph-loop.local.md
 .claude/.ralph-loop.local.md
 *.log
+.gstack/
