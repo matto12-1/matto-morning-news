@@ -146,6 +146,7 @@ body {
 .reward-msg { font-size: 1.2rem; font-weight: 800; margin: 8px 0 4px; }
 .reward-score { color: var(--ink-soft); margin: 0; }
 .quiz-footer { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 8px 0 4px; }
+.nudge { text-align: center; background: #fff4e0; border: 2px solid var(--accent); border-radius: var(--r); padding: 16px; font-weight: 700; color: #8a5a00; }
 
 /* ── 모달 ── */
 .modal-back { position: fixed; inset: 0; background: rgba(35,32,25,.45); display: grid; place-items: center; z-index: 60; padding: 20px; }

@@ -68,6 +68,12 @@ export function renderQuiz(article, { level, onBack } = {}) {
   root.appendChild(footer);
 
   doneBtn.addEventListener("click", () => {
+    const answered = Object.keys(state.comp).length + Object.keys(state.voc).length;
+    if (answered < totalGraded) {
+      result.innerHTML = `<div class="nudge" role="status">✏️ 아직 ${totalGraded - answered}문제가 남았어요. 다 풀고 별을 받아요!</div>`;
+      result.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     const c = scoreSection(q.comprehension, orderedAnswers(state.comp, q.comprehension.length));
     const v = scoreSection(q.vocab, orderedAnswers(state.voc, q.vocab.length));
     const total = c.correct + v.correct;
