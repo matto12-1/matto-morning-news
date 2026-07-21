@@ -33,7 +33,7 @@ function render() {
   tts.stop();
   app.innerHTML = "";
   if (state.view === "archive") {
-    const arch = renderArchive(state.manifest || [], {
+    const arch = renderArchive(state.manifest || [], todayISO(), {
       onOpen: (date) => openIssue(date),
       onClose: () => { state.view = "home"; render(); },
     });

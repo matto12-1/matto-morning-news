@@ -121,11 +121,25 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   return el;
 }
 
-// 지난 호 아카이브 화면.
-export function renderArchive(manifest, { onOpen, onClose } = {}) {
+// 지난 호 아카이브 화면. today: 오늘까지 발행된 호만 보여준다(미래 호 숨김).
+const CAT_SHORT = { science: "과학", history: "역사", literature: "문학", language: "우리말", tech: "기술", society: "사회", art: "예술", mind: "마음" };
+export function renderArchive(manifest, today, { onOpen, onClose } = {}) {
   const el = document.createElement("article");
   el.className = "paper archive";
-  const items = [...manifest].sort((a, b) => b.date.localeCompare(a.date)); // 최신 호부터
+  const items = [...manifest]
+    .filter((it) => !today || it.date <= today)         // 지난 호(오늘까지)만
+    .sort((a, b) => b.date.localeCompare(a.date));       // 최신 호부터
+  const cats = [...new Set(items.map((it) => it.category))];
+  const card = (it) => `
+    <button type="button" class="arch-card cat-${escapeHtml(it.category)}" data-date="${escapeHtml(it.date)}" data-cat="${escapeHtml(it.category)}">
+      <span class="arch-badge">${escapeHtml(it.emoji || "📄")} ${escapeHtml(it.badgeLabel || "")}</span>
+      <span class="arch-t">${escapeHtml(it.title)}</span>
+      <span class="arch-d">${formatDate(it.date)} · 제 ${it.issueNo}호</span>
+    </button>`;
+  const chips = items.length ? `<div class="arch-filter" role="group" aria-label="카테고리 고르기">
+      <button type="button" class="arch-chip active" data-f="all">전체 ${items.length}</button>
+      ${cats.map((c) => `<button type="button" class="arch-chip cat-${escapeHtml(c)}" data-f="${escapeHtml(c)}">${escapeHtml(CAT_SHORT[c] || c)}</button>`).join("")}
+    </div>` : "";
   el.innerHTML = `
     ${SPECKLE}
     <header class="topbar">
@@ -133,17 +147,19 @@ export function renderArchive(manifest, { onOpen, onClose } = {}) {
       <div class="controls"><button type="button" class="tbtn" id="arch-close">← 오늘 호로</button></div>
     </header>
     <h1 class="arch-title">🗂 지난 호</h1>
-    <p class="arch-sub">읽고 싶은 날의 신문을 골라 보세요.</p>
-    <div class="arch-grid">
-      ${items.map((it) => `
-        <button type="button" class="arch-card cat-${escapeHtml(it.category)}" data-date="${escapeHtml(it.date)}">
-          <span class="arch-badge">${escapeHtml(it.emoji || "📄")} ${escapeHtml(it.badgeLabel || "")}</span>
-          <span class="arch-t">${escapeHtml(it.title)}</span>
-          <span class="arch-d">${formatDate(it.date)} · 제 ${it.issueNo}호</span>
-        </button>`).join("")}
-    </div>`;
+    <p class="arch-sub">읽고 싶은 날의 신문을 골라 보세요. 위에서 갈래별로 모아 볼 수 있어요.</p>
+    ${chips}
+    ${items.length
+      ? `<div class="arch-grid">${items.map(card).join("")}</div>`
+      : `<p class="arch-empty">아직 지난 호가 없어요.<br>내일부터 새 신문이 하루에 하나씩 쌓여요! 📚</p>`}`;
   el.querySelector("#arch-close").addEventListener("click", () => onClose?.());
   el.querySelectorAll(".arch-card").forEach((b) => b.addEventListener("click", () => onOpen?.(b.dataset.date)));
+  el.querySelectorAll(".arch-chip").forEach((chip) => chip.addEventListener("click", () => {
+    el.querySelectorAll(".arch-chip").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    const f = chip.dataset.f;
+    el.querySelectorAll(".arch-card").forEach((c) => { c.style.display = (f === "all" || c.dataset.cat === f) ? "" : "none"; });
+  }));
   return el;
 }
 

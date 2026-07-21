@@ -232,6 +232,12 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .arch-d{ margin-top:auto; font-size:.82rem; color:var(--ink-3); font-weight:700; }
 .arch-card.cat-science{ --c:#CF6A4F; } .arch-card.cat-history{ --c:#B98546; } .arch-card.cat-literature{ --c:#8A70B5; } .arch-card.cat-language{ --c:#CF6E54; }
 .arch-card.cat-tech{ --c:#5A7FC0; } .arch-card.cat-society{ --c:#5A9B70; } .arch-card.cat-art{ --c:#B96591; } .arch-card.cat-mind{ --c:#DB8B54; }
+/* 카테고리 필터 칩 */
+.arch-filter{ position:relative; z-index:6; display:flex; flex-wrap:wrap; gap:8px; margin:0 0 20px; }
+.arch-chip{ font-family:var(--round); font-size:.92rem; border:2px solid #e2ddce; background:#fff; color:var(--body); border-radius:999px; padding:7px 16px; cursor:pointer; transition:border-color .12s, background .12s, color .12s; }
+.arch-chip:hover{ border-color:var(--accent); color:var(--accent); }
+.arch-chip.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
+.arch-empty{ position:relative; z-index:6; text-align:center; color:var(--body); font-family:var(--round); font-size:1.2rem; line-height:1.7; padding:44px 0; }
 
 /* 결과: 틀린 문제 다시 보기 */
 .wrong-review{ margin:18px 0 4px; text-align:left; }
