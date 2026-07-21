@@ -4,3 +4,14 @@ node_modules/
 .claude/.ralph-loop.local.md
 *.log
 .gstack/
+
+# 개발 잔재(배포 제외)
+review.html
+sian.html
+mockup-*.html
+example/
+magazine-test/
+SCORES/
+PROMPT.md
+.env
+.env.*

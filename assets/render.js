@@ -163,17 +163,26 @@ export function renderArchive(manifest, today, { onOpen, onClose } = {}) {
   return el;
 }
 
+// 낱말 팝업은 화면에 하나만. document 리스너는 1회만 등록(렌더마다 누수 방지).
+let _openTip = null;
+function _closeTip() {
+  if (!_openTip) return;
+  _openTip._cleanup?.();
+  _openTip.remove();
+  _openTip = null;
+}
+let _docBound = false;
+function _bindDocOnce() {
+  if (_docBound) return;
+  _docBound = true;
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".vocab") && !e.target.closest(".vocab-tip")) _closeTip();
+  });
+}
+
 export function mountVocabTooltips(root, vocab = []) {
   const map = new Map(vocab.map((v) => [v.word, v]));
-  let openTip = null;
-
-  const close = () => {
-    if (!openTip) return;
-    openTip.remove();
-    openTip = null;
-    window.removeEventListener("scroll", reposition, true);
-    window.removeEventListener("resize", close);
-  };
+  _bindDocOnce();
 
   // 팝업을 단어 바로 위(공간 없으면 아래)에 띄우고 화살표 위치를 맞춘다.
   const place = (tip, btn) => {
@@ -196,15 +205,15 @@ export function mountVocabTooltips(root, vocab = []) {
     tip.style.setProperty("--arrow", `${arrow}px`);
   };
 
-  const reposition = () => { if (openTip) place(openTip, openTip._btn); };
+  const reposition = () => { if (_openTip) place(_openTip, _openTip._btn); };
 
   root.addEventListener("click", (e) => {
     const btn = e.target.closest(".vocab");
-    if (!btn) { close(); return; }
+    if (!btn) { _closeTip(); return; }
     e.stopPropagation();
     const word = btn.dataset.word;
-    const wasOpenFor = openTip && openTip._word === word;
-    close();
+    const wasOpenFor = _openTip && _openTip._word === word;
+    _closeTip();
     if (wasOpenFor) return;
 
     const v = map.get(word) || {};
@@ -225,12 +234,14 @@ export function mountVocabTooltips(root, vocab = []) {
     tip.innerHTML = html;
     document.body.appendChild(tip);
     place(tip, btn);
-    openTip = tip;
-    window.addEventListener("scroll", reposition, true);
-    window.addEventListener("resize", close);
-  });
-
-  document.addEventListener("click", (e) => {
-    if (!e.target.closest(".vocab") && !e.target.closest(".vocab-tip")) close();
+    _openTip = tip;
+    const onScroll = () => reposition();
+    const onResize = () => _closeTip();
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", onResize);
+    tip._cleanup = () => {
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onResize);
+    };
   });
 }

@@ -71,9 +71,13 @@ export function printWorksheet(article, level, mode) {
 export function buildWorksheetHtml(article, level, mode) {
   const teacher = mode === "teacher";
   const q = article.quiz;
+  // comprehension은 { lower, upper } 객체(구버전 배열도 허용)
+  const comp = Array.isArray(q.comprehension)
+    ? q.comprehension
+    : (q.comprehension?.[level] || q.comprehension?.lower || []);
   let n = 0;
-  const compHtml = q.comprehension.map((it) => renderQ(++n, it, teacher)).join("");
-  const vocHtml = q.vocab.map((it) => renderQ(++n, it, teacher)).join("");
+  const compHtml = comp.map((it) => renderQ(++n, it, teacher)).join("");
+  const vocHtml = (q.vocab || []).map((it) => renderQ(++n, it, teacher)).join("");
   const thinkHtml = `
     <div class="pw-q">
       <p class="pw-qtext"><b>${++n}.</b> ${esc(q.think.question)}</p>
@@ -102,12 +106,20 @@ export function buildWorksheetHtml(article, level, mode) {
       opts = `<ol class="pw-choices">${it.choices.map((c, i) =>
         `<li class="${showAns && i === it.answerIndex ? "correct" : ""}">${esc(c)}</li>`).join("")}</ol>`;
       if (showAns) ans = `정답 ${it.answerIndex + 1}번` + (it.explain ? ` — ${esc(it.explain)}` : "");
+    } else if (it.type === "multi") {
+      opts = `<ol class="pw-choices">${it.choices.map((c, i) =>
+        `<li class="${showAns && (it.answerIndexes || []).includes(i) ? "correct" : ""}">${esc(c)}</li>`).join("")}</ol>`;
+      if (showAns) ans = `정답 ${(it.answerIndexes || []).map((i) => i + 1).join(", ")}번` + (it.explain ? ` — ${esc(it.explain)}` : "");
     } else if (it.type === "ox") {
       opts = `<p class="pw-ox">( O / X )</p>`;
       if (showAns) ans = `정답 ${it.answer ? "O" : "X"}` + (it.explain ? ` — ${esc(it.explain)}` : "");
     } else if (it.type === "cloze") {
       opts = `<p class="pw-cloze">답: ____________</p>`;
-      if (showAns) ans = `정답 ${esc(it.acceptable[0])}`;
+      if (showAns) ans = `정답 ${esc((it.acceptable || [])[0] || "")}` + (it.explain ? ` — ${esc(it.explain)}` : "");
+    } else if (it.type === "order") {
+      const shown = [...(it.steps || [])].reverse(); // 정답 순서 그대로 노출 방지
+      opts = `<ul class="pw-order">${shown.map((s) => `<li>( &nbsp; ) ${esc(s)}</li>`).join("")}</ul>`;
+      if (showAns) ans = `정답 순서: ${(it.steps || []).map((s, i) => `${i + 1}. ${esc(s)}`).join(" → ")}`;
     }
     return `<div class="pw-q">
       <p class="pw-qtext"><b>${num}.</b> ${esc(it.question)}</p>

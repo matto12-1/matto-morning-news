@@ -79,7 +79,7 @@ export function renderQuiz(article, { level = "lower", onBack } = {}) {
   const root = document.createElement("section");
   root.className = "quiz";
   root.innerHTML = `
-    <h2 class="quiz-title">📝 오늘의 퀴즈</h2>
+    <h1 class="quiz-title">📝 오늘의 퀴즈</h1>
     <div class="quiz-progress" role="status" aria-live="polite">
       <div class="qp-bar"><span class="qp-fill" style="width:0%"></span></div>
       <span class="qp-label">0 / ${total} 문제</span>
