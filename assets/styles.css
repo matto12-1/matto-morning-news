@@ -60,6 +60,8 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .title-en{ margin:0 0 4px; font-family:var(--round); font-size:.9rem; letter-spacing:.1em; color:var(--accent); }
 .hook{ font-family:var(--round); color:var(--accent); font-size:clamp(2.6rem,6.6vw,4.4rem); line-height:1.04; margin:0; text-shadow:3px 3px 0 #fff, 5px 5px 0 rgba(0,0,0,.06); }
 .subtitle{ font-family:var(--round); color:var(--ink); font-size:clamp(1.4rem,3.4vw,2.2rem); line-height:1.2; margin:.15em 0 0; }
+/* 제목류는 단어 중간에서 안 잘리게(한글 어절 단위 줄바꿈) */
+.hook, .subtitle, .redhead, .title-en, .tag .lg, .quiz-title, .brand{ word-break:keep-all; }
 .hero{ position:absolute; right:-6px; top:6px; width:min(30%,300px); z-index:2; }
 .hero svg{ display:block; width:100%; height:auto; }
 .float{ position:absolute; z-index:3; }
