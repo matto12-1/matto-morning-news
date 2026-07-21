@@ -56,6 +56,11 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   const rt = article.readingTimeMin?.[level];
   const intro = article.intro || article.subtitle || "";
   const badgeTease = article.badgeTease || "함께 알아봐요";
+  const secs = Array.isArray(article.body[level]) ? article.body[level] : [];
+  const headings = secs.map((s) => s.heading).filter(Boolean);
+  const tocHtml = headings.length
+    ? `<div class="toc"><p class="toc-h">📖 이 글에서는</p><ol>${headings.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}</ol></div>`
+    : "";
 
   el.innerHTML = `
     ${SPECKLE}
@@ -72,19 +77,20 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
       </div>
     </header>
 
-    <div class="badge"><div class="tag"><span class="sm">${escapeHtml(badgeTease)}</span><span class="lg">${SHORT_CAT[cat] || "오늘"} 특집</span></div></div>
-
-    <p class="intro">${escapeHtml(intro)}<span class="by">글·그림 ${escapeHtml(SITE_NAME)} 편집부</span></p>
-
-    <div class="cover">
-      <div class="cover-title">
-        ${article.titleEn ? `<p class="title-en">${escapeHtml(article.titleEn)}</p>` : ""}
-        <h1 class="hook">${escapeHtml(article.title)}</h1>
-        <p class="subtitle">${escapeHtml(article.subtitle)}</p>
+    <div class="lead">
+      <div class="lead-main">
+        <div class="badge"><div class="tag"><span class="sm">${escapeHtml(badgeTease)}</span><span class="lg">${SHORT_CAT[cat] || "오늘"} 특집</span></div></div>
+        <p class="intro">${escapeHtml(intro)}<span class="by">글·그림 ${escapeHtml(SITE_NAME)} 편집부</span></p>
+        <div class="cover-title">
+          ${article.titleEn ? `<p class="title-en">${escapeHtml(article.titleEn)}</p>` : ""}
+          <h1 class="hook">${escapeHtml(article.title)}</h1>
+          <p class="subtitle">${escapeHtml(article.subtitle)}</p>
+        </div>
       </div>
-      <div class="hero">${heroSvg(cat)}</div>
-      <div class="float s1">${STAR("#FFD84D", "#EABB2E")}</div>
-      <div class="float s2">${STAR("#8FD3F2", "#5BB4E5")}</div>
+      <aside class="lead-side">
+        ${tocHtml}
+        <div class="hero">${heroSvg(cat)}<div class="float s1">${STAR("#FFD84D", "#EABB2E")}</div><div class="float s2">${STAR("#8FD3F2", "#5BB4E5")}</div></div>
+      </aside>
     </div>
 
     <div class="story">
