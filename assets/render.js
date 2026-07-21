@@ -1,6 +1,6 @@
 // assets/render.js — 어린이 잡지 시안 결의 홈/기사 렌더.
 import { SITE_NAME, CATEGORY_LABELS, LEVELS } from "./config.js";
-import { heroSvg, SPECKLE, STAR } from "./art.js";
+import { SPECKLE } from "./art.js";
 
 const escapeHtml = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -56,11 +56,6 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   const rt = article.readingTimeMin?.[level];
   const intro = article.intro || article.subtitle || "";
   const badgeTease = article.badgeTease || "함께 알아봐요";
-  const secs = Array.isArray(article.body[level]) ? article.body[level] : [];
-  const headings = secs.map((s) => s.heading).filter(Boolean);
-  const tocHtml = headings.length
-    ? `<div class="toc"><p class="toc-h">📖 이 글에서는</p><ol>${headings.map((h) => `<li>${escapeHtml(h)}</li>`).join("")}</ol></div>`
-    : "";
 
   el.innerHTML = `
     ${SPECKLE}
@@ -71,8 +66,6 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
           <button type="button" class="lvl" data-level="lower" aria-pressed="${level === "lower"}">${LEVELS.lower.label}</button>
           <button type="button" class="lvl" data-level="upper" aria-pressed="${level === "upper"}">${LEVELS.upper.label}</button>
         </div>
-        <button type="button" class="tbtn" id="tts-btn" hidden>🔊 읽어주기</button>
-        <button type="button" class="tbtn" id="font-btn" aria-pressed="false">가+ 큰 글씨</button>
         <button type="button" class="tbtn" id="print-btn">🖨 인쇄</button>
       </div>
     </header>
@@ -88,8 +81,7 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
         </div>
       </div>
       <aside class="lead-side">
-        ${tocHtml}
-        <div class="hero">${heroSvg(cat)}<div class="float s1">${STAR("#FFD84D", "#EABB2E")}</div><div class="float s2">${STAR("#8FD3F2", "#5BB4E5")}</div></div>
+        <div class="img-slot" role="img" aria-label="기사 관련 그림 자리"><span class="img-ph"><span class="em">🖼️</span>그림이 들어갈 자리</span></div>
       </aside>
     </div>
 
