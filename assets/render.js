@@ -1,19 +1,12 @@
-// assets/render.js — 에디토리얼(잡지) 홈 렌더: 제호·키커·데크·메타바·드롭캡·발췌 인용·낱말풀이.
-import { SITE_NAME, CATEGORY_LABELS, CATEGORY_EMOJI, LEVELS } from "./config.js";
-import { heroSvg, MASCOT } from "./art.js";
-
-// 제목에서 강조 낱말(titleHi)만 색칠.
-function highlightTitle(title, hi) {
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  if (hi && title.includes(hi)) return esc(title).replace(esc(hi), `<mark class="hi">${esc(hi)}</mark>`);
-  return esc(title);
-}
+// assets/render.js — 어린이 잡지 시안 결의 홈/기사 렌더.
+import { SITE_NAME, CATEGORY_LABELS, LEVELS } from "./config.js";
+import { heroSvg, SPECKLE, STAR } from "./art.js";
 
 const escapeHtml = (s) =>
-  String(s).replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
-  );
+  String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const escapeReg = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const SHORT_CAT = { science: "과학", history: "역사", literature: "문학", language: "우리말" };
 
 export function formatDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
@@ -22,7 +15,7 @@ export function formatDate(iso) {
   return `${y}년 ${m}월 ${d}일 ${wd}요일`;
 }
 
-// 본문 텍스트를 문단별 <p> 배열로. 어휘 낱말은 <button.vocab>로 감싼다.
+// 문단 배열(어휘 낱말 하이라이트 포함)
 export function renderParagraphs(text, vocab = []) {
   const words = vocab.map((v) => v.word).filter(Boolean).sort((a, b) => b.length - a.length);
   const re = words.length ? new RegExp("(" + words.map(escapeReg).join("|") + ")", "g") : null;
@@ -41,22 +34,18 @@ export function renderParagraphs(text, vocab = []) {
   });
 }
 
-// 호환용: 문단을 이어붙인 문자열.
 export function renderBody(text, vocab = []) {
   return renderParagraphs(text, vocab).join("");
 }
 
-// 본문 조판: 섹션 배열([{heading?, text}]) 또는 문자열을 2단 조판 HTML로.
-export function renderStory(body, vocab = [], pullquote = "") {
+// 섹션(배열 또는 문자열)을 소제목 + 2단으로. 첫 문단엔 드롭캡.
+export function renderStory(body, vocab = []) {
   const sections = Array.isArray(body) ? body : [{ text: String(body) }];
   return sections.map((sec, si) => {
     const paras = renderParagraphs(sec.text, vocab);
-    if (si === 0 && pullquote) {
-      const at = Math.min(1, paras.length);
-      paras.splice(at, 0, `<blockquote class="pullquote"><span aria-hidden="true">“</span>${escapeHtml(pullquote)}</blockquote>`);
-    }
-    const head = sec.heading ? `<h3 class="section-head">${escapeHtml(sec.heading)}</h3>` : "";
-    return `<section class="story-section${si === 0 ? " first" : ""}">${head}<div class="cols">${paras.join("")}</div></section>`;
+    if (si === 0 && paras.length) paras[0] = paras[0].replace("<p>", '<p class="drop">');
+    const head = sec.heading ? `<h2 class="redhead">${escapeHtml(sec.heading)}</h2>` : "";
+    return head + `<div class="cols">${paras.join("")}</div>`;
   }).join("");
 }
 
@@ -65,62 +54,49 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   el.className = `paper cat-${article.category}`;
   const cat = article.category;
   const rt = article.readingTimeMin?.[level];
-
-  // 본문(섹션 배열 또는 문자열) → 2단 조판 + 발췌 인용.
-  const storyHtml = renderStory(article.body[level], article.vocab, article.pullquote);
+  const intro = article.intro || article.subtitle || "";
+  const badgeTease = article.badgeTease || "함께 알아봐요";
 
   el.innerHTML = `
-    <header class="masthead">
-      <span class="brand">${escapeHtml(SITE_NAME)}</span>
-      <span class="masthead-meta">${escapeHtml(formatDate(article.date))} · 제 ${article.issueNo} 호</span>
-    </header>
-
-    <nav class="toolbar" aria-label="읽기 도구">
-      <div class="level-toggle" role="group" aria-label="학년 선택">
-        <button type="button" class="lvl" data-level="lower" aria-pressed="${level === "lower"}">${LEVELS.lower.label}</button>
-        <button type="button" class="lvl" data-level="upper" aria-pressed="${level === "upper"}">${LEVELS.upper.label}</button>
-      </div>
-      <div class="toolbar-right">
+    ${SPECKLE}
+    <header class="topbar">
+      <span class="brand">${escapeHtml(SITE_NAME)}<span class="brand-meta">${escapeHtml(formatDate(article.date))} · 제 ${article.issueNo} 호</span></span>
+      <div class="controls">
+        <div class="level-toggle" role="group" aria-label="학년 선택">
+          <button type="button" class="lvl" data-level="lower" aria-pressed="${level === "lower"}">${LEVELS.lower.label}</button>
+          <button type="button" class="lvl" data-level="upper" aria-pressed="${level === "upper"}">${LEVELS.upper.label}</button>
+        </div>
         <button type="button" class="tbtn" id="tts-btn" hidden>🔊 읽어주기</button>
-        <button type="button" class="tbtn" id="font-btn" aria-pressed="false">가<span aria-hidden="true">＋</span> 큰 글씨</button>
+        <button type="button" class="tbtn" id="font-btn" aria-pressed="false">가+ 큰 글씨</button>
         <button type="button" class="tbtn" id="print-btn">🖨 인쇄</button>
       </div>
-    </nav>
+    </header>
 
-    <div class="article">
-      <div class="cover">
-        <div class="cover-text">
-          <p class="feat-badge">${CATEGORY_EMOJI[cat] || "📰"} ${escapeHtml(CATEGORY_LABELS[cat] || "")} 특집</p>
-          ${article.titleEn ? `<p class="title-en">${escapeHtml(article.titleEn)}</p>` : ""}
-          <h2 class="headline">${highlightTitle(article.title, article.titleHi)}</h2>
-          <p class="deck">${escapeHtml(article.subtitle)}</p>
-        </div>
-        <div class="cover-art">${heroSvg(cat)}${article.heroSpeech ? `<span class="hero-speech">${escapeHtml(article.heroSpeech)}</span>` : ""}</div>
+    <div class="badge"><div class="tag"><span class="sm">${escapeHtml(badgeTease)}</span><span class="lg">${SHORT_CAT[cat] || "오늘"} 특집</span></div></div>
+
+    <p class="intro">${escapeHtml(intro)}<span class="by">글·그림 ${escapeHtml(SITE_NAME)} 편집부</span></p>
+
+    <div class="cover">
+      <div class="cover-title">
+        ${article.titleEn ? `<p class="title-en">${escapeHtml(article.titleEn)}</p>` : ""}
+        <h1 class="hook">${escapeHtml(article.title)}</h1>
+        <p class="subtitle">${escapeHtml(article.subtitle)}</p>
       </div>
-      <div class="byline">
-        <span class="byline-level">${LEVELS[level].label} · ${LEVELS[level].sub}</span>
-        ${rt ? `<span class="byline-time">읽기 ${rt}분</span>` : ""}
-      </div>
-      <div class="body" id="article-body">${storyHtml}</div>
-      ${renderFacts(article.facts)}
-      ${renderTopics(article.topics)}
-      ${article.factbox ? `<aside class="factbox">
-        <div class="factbox-mascot">${MASCOT}</div>
-        <div class="factbox-body"><p class="factbox-title">${escapeHtml(article.factbox.title)}</p><p>${escapeHtml(article.factbox.text)}</p></div>
+      <div class="hero">${heroSvg(cat)}</div>
+      <div class="float s1">${STAR("#FFD84D", "#EABB2E")}</div>
+      <div class="float s2">${STAR("#8FD3F2", "#5BB4E5")}</div>
+    </div>
+
+    <div class="story">
+      <div id="article-body">${renderStory(article.body[level], article.vocab)}</div>
+      ${article.factbox ? `<aside class="callout">
+        <svg class="ic" viewBox="0 0 60 60" aria-hidden="true"><circle cx="26" cy="26" r="18" fill="none" stroke="#2FA79B" stroke-width="6"/><line x1="39" y1="39" x2="54" y2="54" stroke="#2FA79B" stroke-width="7" stroke-linecap="round"/></svg>
+        <h3>${escapeHtml(article.factbox.title)}</h3>
+        <p>${escapeHtml(article.factbox.text)}</p>
       </aside>` : ""}
-      <aside class="glossary" aria-label="오늘의 낱말">
-        <p class="glossary-label">낱말 풀이</p>
-        <dl>
-          ${(article.vocab || []).map((v) =>
-            `<div class="gloss-row"><dt>${escapeHtml(v.word)}</dt><dd>${escapeHtml(v.meaning)}</dd></div>`
-          ).join("")}
-        </dl>
-      </aside>
     </div>
 
-    <div class="cta">
-      <button type="button" class="btn primary big" id="start-quiz">오늘의 문제 풀기 →</button>
-    </div>
+    <div class="cta"><button type="button" class="btn primary big" id="start-quiz">오늘의 문제 풀기 →</button></div>
   `;
 
   mountVocabTooltips(el, article.vocab);
@@ -130,20 +106,6 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   el.querySelector("#start-quiz").addEventListener("click", () => handlers.onStartQuiz?.());
   el.querySelector("#print-btn").addEventListener("click", () => handlers.onPrint?.());
   return el;
-}
-
-function renderFacts(facts) {
-  if (!Array.isArray(facts) || !facts.length) return "";
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  return `<div class="facts"><p class="facts-label">🔢 숫자로 보는 오늘</p><div class="facts-row">${facts.map((f) =>
-    `<div class="fact-chip"><span class="fact-icon">${esc(f.icon || "✨")}</span><span class="fact-label">${esc(f.label)}</span><span class="fact-value">${esc(f.value)}</span></div>`).join("")}</div></div>`;
-}
-
-function renderTopics(topics) {
-  if (!Array.isArray(topics) || !topics.length) return "";
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  return `<section class="topics"><p class="topics-label">🔎 더 알아볼까?</p><div class="topics-grid">${topics.map((t) =>
-    `<div class="topic-box"><p class="topic-title"><span class="topic-ic">${esc(t.icon || "🔎")}</span> ${esc(t.title)}</p><p class="topic-text">${esc(t.text)}</p></div>`).join("")}</div></section>`;
 }
 
 export function mountVocabTooltips(root, vocab = []) {

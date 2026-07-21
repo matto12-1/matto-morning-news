@@ -14,7 +14,7 @@
     --round:"Jua", "Pretendard", sans-serif;
     --sans:"Pretendard Variable", Pretendard, system-ui, sans-serif;
   }
-  body{ margin:0; font-family:var(--sans); color:var(--ink); background:#dceefb; word-break:keep-all; overflow-wrap:break-word; }
+  body{ margin:0; font-family:var(--sans); color:var(--ink); background:#dceefb; }
   .spread{
     position:relative; max-width:1180px; margin:0 auto; overflow:hidden;
     background:
@@ -67,8 +67,7 @@
   .redhead .mark{ color:var(--ink); }
   .cols{ column-count:2; column-gap:40px; font-size:1.12rem; line-height:1.9; color:var(--body); text-align:left; }
   .cols p{ margin:0 0 1em; }
-  /* 리드 문장 강조(드롭캡 대신 — 정렬 안정적) */
-  .cols p.drop::first-line{ font-weight:800; }
+  .cols .drop::first-letter{ font-family:var(--round); color:var(--coral); font-size:3.1em; line-height:.72; float:left; margin:.18em .12em -.04em 0; }
   .vocab{ color:var(--ink); font-weight:800; box-shadow:inset 0 -.36em 0 #FFDD84; }
 
   /* 청록 겹테두리 콜아웃 */

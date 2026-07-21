@@ -57,7 +57,7 @@ function render() {
   app.appendChild(home);
   wireTts(home);
   wireFontToggle(home);
-  focusMain(".headline");
+  focusMain(".hook");
   state.booted = true;
 }
 
