@@ -102,7 +102,7 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
     <div class="story">
       <div id="article-body">${renderStory(article.body[level], article.vocab)}</div>
       ${article.factbox ? `<aside class="callout">
-        <svg class="ic" viewBox="0 0 60 60" aria-hidden="true"><circle cx="26" cy="26" r="18" fill="none" stroke="#2FA79B" stroke-width="6"/><line x1="39" y1="39" x2="54" y2="54" stroke="#2FA79B" stroke-width="7" stroke-linecap="round"/></svg>
+        <svg class="ic" viewBox="0 0 60 60" aria-hidden="true"><circle cx="26" cy="26" r="18" fill="none" stroke="currentColor" stroke-width="6"/><line x1="39" y1="39" x2="54" y2="54" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></svg>
         <h3>${escapeHtml(article.factbox.title)}</h3>
         <p>${escapeHtml(article.factbox.text)}</p>
       </aside>` : ""}
@@ -147,7 +147,7 @@ export function renderArchive(manifest, today, { onOpen, onClose } = {}) {
       <div class="controls"><button type="button" class="tbtn" id="arch-close">← 오늘 호로</button></div>
     </header>
     <h1 class="arch-title">🗂 지난 호</h1>
-    <p class="arch-sub">읽고 싶은 날의 신문을 골라 보세요. 위에서 갈래별로 모아 볼 수 있어요.</p>
+    ${items.length ? `<p class="arch-sub">읽고 싶은 날의 신문을 골라 보세요. 위에서 갈래별로 모아 볼 수 있어요.</p>` : ""}
     ${chips}
     ${items.length
       ? `<div class="arch-grid">${items.map(card).join("")}</div>`
