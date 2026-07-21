@@ -52,7 +52,35 @@ body {
 .headline .hi { background: linear-gradient(transparent 55%, var(--mark) 55%); color: var(--accent); padding: 0 .05em; border-radius: 3px; }
 .deck { font-size: clamp(1rem, 2.4vw, 1.2rem); font-weight: 600; color: var(--ink-2); margin: 0; line-height: 1.5; }
 .cover-art { border-radius: 16px; overflow: hidden; aspect-ratio: 4/3; box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+.cover-art { position: relative; }
 .cover-art svg { display: block; width: 100%; height: 100%; }
+
+/* 히어로 말풍선 */
+.hero-speech { position: absolute; left: 12px; bottom: 12px; max-width: 64%; background: #fff; color: var(--ink); font-weight: 800; font-size: .84rem; line-height: 1.35; padding: 9px 13px; border-radius: 14px; border: 2px solid var(--ink); box-shadow: 0 3px 0 rgba(0,0,0,.12); }
+.hero-speech::after { content: ""; position: absolute; right: 22px; top: -12px; border: 7px solid transparent; border-bottom-color: var(--ink); }
+.hero-speech::before { content: ""; position: absolute; right: 24px; top: -8px; border: 5px solid transparent; border-bottom-color: #fff; z-index: 1; }
+
+/* 숫자로 보는 오늘 (칩) */
+.facts { margin: 22px 0 6px; }
+.facts-label { font-weight: 900; color: var(--accent); margin: 0 0 10px; font-size: 1.02rem; }
+.facts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.fact-chip { background: var(--tint); border-radius: 16px; padding: 14px 12px; text-align: center; }
+.fact-icon { font-size: 1.7rem; display: block; }
+.fact-label { display: block; font-size: .76rem; color: var(--ink-3); font-weight: 800; margin-top: 4px; }
+.fact-value { display: block; font-weight: 800; color: var(--ink); margin-top: 2px; font-size: .92rem; }
+
+/* 더 알아볼까? (토픽 박스) */
+.topics { margin: 26px 0 6px; }
+.topics-label { font-weight: 900; color: var(--accent); margin: 0 0 12px; font-size: 1.08rem; }
+.topics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+.topic-box { background: #fff; border: 2.5px solid var(--accent); border-radius: 18px; padding: 15px 17px; box-shadow: 0 4px 0 rgba(0,0,0,.05); }
+.topic-box:nth-child(3n+2) { border-color: var(--accent2); }
+.topic-box:nth-child(3n) { border-color: var(--ink); }
+.topic-title { margin: 0 0 6px; font-weight: 900; color: var(--ink); display: flex; gap: 7px; align-items: baseline; }
+.topic-ic { font-size: 1.15rem; }
+.topic-text { margin: 0; color: var(--ink-2); line-height: 1.55; font-size: .95rem; }
+
+@media (max-width: 620px) { .facts-row { grid-template-columns: 1fr; } }
 
 /* ── 바이라인 ── */
 .byline { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 2px 6px; font-size: .8rem; font-weight: 700; color: var(--ink-3); }

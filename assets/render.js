@@ -95,13 +95,15 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
           <h2 class="headline">${highlightTitle(article.title, article.titleHi)}</h2>
           <p class="deck">${escapeHtml(article.subtitle)}</p>
         </div>
-        <div class="cover-art">${heroSvg(cat)}</div>
+        <div class="cover-art">${heroSvg(cat)}${article.heroSpeech ? `<span class="hero-speech">${escapeHtml(article.heroSpeech)}</span>` : ""}</div>
       </div>
       <div class="byline">
         <span class="byline-level">${LEVELS[level].label} · ${LEVELS[level].sub}</span>
         ${rt ? `<span class="byline-time">읽기 ${rt}분</span>` : ""}
       </div>
       <div class="body" id="article-body">${storyHtml}</div>
+      ${renderFacts(article.facts)}
+      ${renderTopics(article.topics)}
       ${article.factbox ? `<aside class="factbox">
         <div class="factbox-mascot">${MASCOT}</div>
         <div class="factbox-body"><p class="factbox-title">${escapeHtml(article.factbox.title)}</p><p>${escapeHtml(article.factbox.text)}</p></div>
@@ -128,6 +130,20 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   el.querySelector("#start-quiz").addEventListener("click", () => handlers.onStartQuiz?.());
   el.querySelector("#print-btn").addEventListener("click", () => handlers.onPrint?.());
   return el;
+}
+
+function renderFacts(facts) {
+  if (!Array.isArray(facts) || !facts.length) return "";
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  return `<div class="facts"><p class="facts-label">🔢 숫자로 보는 오늘</p><div class="facts-row">${facts.map((f) =>
+    `<div class="fact-chip"><span class="fact-icon">${esc(f.icon || "✨")}</span><span class="fact-label">${esc(f.label)}</span><span class="fact-value">${esc(f.value)}</span></div>`).join("")}</div></div>`;
+}
+
+function renderTopics(topics) {
+  if (!Array.isArray(topics) || !topics.length) return "";
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  return `<section class="topics"><p class="topics-label">🔎 더 알아볼까?</p><div class="topics-grid">${topics.map((t) =>
+    `<div class="topic-box"><p class="topic-title"><span class="topic-ic">${esc(t.icon || "🔎")}</span> ${esc(t.title)}</p><p class="topic-text">${esc(t.text)}</p></div>`).join("")}</div></section>`;
 }
 
 export function mountVocabTooltips(root, vocab = []) {
