@@ -1,5 +1,13 @@
 // assets/render.js — 에디토리얼(잡지) 홈 렌더: 제호·키커·데크·메타바·드롭캡·발췌 인용·낱말풀이.
-import { SITE_NAME, SITE_TAGLINE, CATEGORY_LABELS, LEVELS } from "./config.js";
+import { SITE_NAME, CATEGORY_LABELS, CATEGORY_EMOJI, LEVELS } from "./config.js";
+import { heroSvg, MASCOT } from "./art.js";
+
+// 제목에서 강조 낱말(titleHi)만 색칠.
+function highlightTitle(title, hi) {
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  if (hi && title.includes(hi)) return esc(title).replace(esc(hi), `<mark class="hi">${esc(hi)}</mark>`);
+  return esc(title);
+}
 
 const escapeHtml = (s) =>
   String(s).replace(/[&<>"']/g, (c) =>
@@ -63,12 +71,8 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
 
   el.innerHTML = `
     <header class="masthead">
-      <div class="masthead-top">
-        <span>${escapeHtml(SITE_TAGLINE)}</span>
-        <span>초등 문해력 신문</span>
-      </div>
-      <h1 class="nameplate">${escapeHtml(SITE_NAME)}</h1>
-      <div class="masthead-rule"><span>${escapeHtml(formatDate(article.date))}</span><span>제 ${article.issueNo} 호</span></div>
+      <span class="brand">${escapeHtml(SITE_NAME)}</span>
+      <span class="masthead-meta">${escapeHtml(formatDate(article.date))} · 제 ${article.issueNo} 호</span>
     </header>
 
     <nav class="toolbar" aria-label="읽기 도구">
@@ -84,14 +88,24 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
     </nav>
 
     <div class="article">
-      <p class="kicker">${escapeHtml(CATEGORY_LABELS[cat] || "")}</p>
-      <h2 class="headline">${escapeHtml(article.title)}</h2>
-      <p class="deck">${escapeHtml(article.subtitle)}</p>
+      <div class="cover">
+        <div class="cover-text">
+          <p class="feat-badge">${CATEGORY_EMOJI[cat] || "📰"} ${escapeHtml(CATEGORY_LABELS[cat] || "")} 특집</p>
+          ${article.titleEn ? `<p class="title-en">${escapeHtml(article.titleEn)}</p>` : ""}
+          <h2 class="headline">${highlightTitle(article.title, article.titleHi)}</h2>
+          <p class="deck">${escapeHtml(article.subtitle)}</p>
+        </div>
+        <div class="cover-art">${heroSvg(cat)}</div>
+      </div>
       <div class="byline">
         <span class="byline-level">${LEVELS[level].label} · ${LEVELS[level].sub}</span>
         ${rt ? `<span class="byline-time">읽기 ${rt}분</span>` : ""}
       </div>
       <div class="body" id="article-body">${storyHtml}</div>
+      ${article.factbox ? `<aside class="factbox">
+        <div class="factbox-mascot">${MASCOT}</div>
+        <div class="factbox-body"><p class="factbox-title">${escapeHtml(article.factbox.title)}</p><p>${escapeHtml(article.factbox.text)}</p></div>
+      </aside>` : ""}
       <aside class="glossary" aria-label="오늘의 낱말">
         <p class="glossary-label">낱말 풀이</p>
         <dl>

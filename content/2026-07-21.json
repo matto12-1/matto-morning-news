@@ -4,8 +4,11 @@
   "category": "science",
   "categoryLabel": "과학·자연·우주",
   "title": "왜 하늘은 파랄까?",
+  "titleEn": "WHY IS THE SKY BLUE?",
+  "titleHi": "파랄까?",
   "subtitle": "햇빛 속에 숨은 무지개, 그리고 노을의 비밀",
   "pullquote": "파란빛은 붉은빛보다 훨씬 강하게 흩어져, 하늘 어디를 봐도 파랗게 보인다.",
+  "factbox": { "title": "콕! 알아두기", "text": "우주에는 공기가 거의 없어서, 우주 비행사가 보는 하늘은 낮에도 새까매요. 하늘색은 사실 '공기'가 만드는 셈이지요!" },
   "readingTimeMin": { "lower": 4, "upper": 6 },
   "body": {
     "lower": [
