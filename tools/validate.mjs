@@ -15,8 +15,13 @@ export function validateArticle(a) {
   req(CATS.includes(a.category), `category 오류(${CATS.join("/")})`);
   req(!!a.title, "title 누락");
   req(!!a.subtitle, "subtitle 누락");
-  req(a.body && typeof a.body.lower === "string" && a.body.lower.trim().length > 0, "body.lower 누락");
-  req(a.body && typeof a.body.upper === "string" && a.body.upper.trim().length > 0, "body.upper 누락");
+  const bodyOk = (b) => {
+    if (typeof b === "string") return b.trim().length > 0;
+    if (Array.isArray(b)) return b.length > 0 && b.every((s) => s && typeof s.text === "string" && s.text.trim().length > 0);
+    return false;
+  };
+  req(a.body && bodyOk(a.body.lower), "body.lower 누락/형식오류(문자열 또는 섹션 배열)");
+  req(a.body && bodyOk(a.body.upper), "body.upper 누락/형식오류(문자열 또는 섹션 배열)");
 
   req(Array.isArray(a.vocab) && a.vocab.length >= 3, "vocab 3개 이상 필요");
   (a.vocab || []).forEach((v, i) => req(v && v.word && v.meaning, `vocab[${i}] 낱말/뜻 누락`));

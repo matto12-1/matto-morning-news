@@ -38,17 +38,28 @@ export function renderBody(text, vocab = []) {
   return renderParagraphs(text, vocab).join("");
 }
 
+// 본문 조판: 섹션 배열([{heading?, text}]) 또는 문자열을 2단 조판 HTML로.
+export function renderStory(body, vocab = [], pullquote = "") {
+  const sections = Array.isArray(body) ? body : [{ text: String(body) }];
+  return sections.map((sec, si) => {
+    const paras = renderParagraphs(sec.text, vocab);
+    if (si === 0 && pullquote) {
+      const at = Math.min(1, paras.length);
+      paras.splice(at, 0, `<blockquote class="pullquote"><span aria-hidden="true">“</span>${escapeHtml(pullquote)}</blockquote>`);
+    }
+    const head = sec.heading ? `<h3 class="section-head">${escapeHtml(sec.heading)}</h3>` : "";
+    return `<section class="story-section${si === 0 ? " first" : ""}">${head}<div class="cols">${paras.join("")}</div></section>`;
+  }).join("");
+}
+
 export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   const el = document.createElement("article");
   el.className = `paper cat-${article.category}`;
   const cat = article.category;
   const rt = article.readingTimeMin?.[level];
 
-  // 본문 + 발췌 인용(pullquote) 삽입(첫 문단 뒤).
-  const paras = renderParagraphs(article.body[level], article.vocab);
-  if (article.pullquote && paras.length >= 2) {
-    paras.splice(1, 0, `<blockquote class="pullquote"><span>“</span>${escapeHtml(article.pullquote)}</blockquote>`);
-  }
+  // 본문(섹션 배열 또는 문자열) → 2단 조판 + 발췌 인용.
+  const storyHtml = renderStory(article.body[level], article.vocab, article.pullquote);
 
   el.innerHTML = `
     <header class="masthead">
@@ -80,7 +91,7 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
         <span class="byline-level">${LEVELS[level].label} · ${LEVELS[level].sub}</span>
         ${rt ? `<span class="byline-time">읽기 ${rt}분</span>` : ""}
       </div>
-      <div class="body" id="article-body">${paras.join("")}</div>
+      <div class="body" id="article-body">${storyHtml}</div>
       <aside class="glossary" aria-label="오늘의 낱말">
         <p class="glossary-label">낱말 풀이</p>
         <dl>

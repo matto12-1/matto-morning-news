@@ -6,7 +6,11 @@ const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
   );
-const paras = (t) => String(t).split(/\n\n+/).map((p) => `<p>${esc(p)}</p>`).join("");
+const parasOf = (t) => String(t).split(/\n\n+/).map((p) => `<p>${esc(p)}</p>`).join("");
+const bodyToHtml = (body) => {
+  const secs = Array.isArray(body) ? body : [{ text: String(body) }];
+  return secs.map((s) => (s.heading ? `<h3 class="pw-sec">${esc(s.heading)}</h3>` : "") + parasOf(s.text)).join("");
+};
 
 // 옵션 선택 모달을 띄운다. 화면 level을 기본값으로.
 export function openPrintDialog(article, defaultLevel = "lower") {
@@ -85,7 +89,7 @@ export function buildWorksheetHtml(article, level, mode) {
       </div>
       <h1 class="pw-title">${esc(article.title)}</h1>
       <p class="pw-sub">${esc(article.subtitle)} · ${LEVELS[level].label}(${LEVELS[level].sub})</p>
-      <div class="pw-body">${paras(article.body[level])}</div>
+      <div class="pw-body">${bodyToHtml(article.body[level])}</div>
       <hr />
       <h2 class="pw-h2">📝 내용 이해</h2>${compHtml}
       <h2 class="pw-h2">🔤 어휘</h2>${vocHtml}

@@ -21,6 +21,7 @@
 .pw-title { font-size: 18pt; margin: 12px 0 2px; }
 .pw-sub { margin: 0 0 10px; color: #333; font-size: 10pt; }
 .pw-body p { margin: 0 0 .55em; }
+.pw-sec { font-size: 12pt; font-weight: 800; margin: 9px 0 3px; }
 .worksheet hr { border: 0; border-top: 1px dashed #999; margin: 12px 0; }
 .pw-h2 { font-size: 12.5pt; margin: 14px 0 6px; background: #f0f0f0; padding: 3px 8px; border-radius: 4px; }
 .pw-q { margin: 0 0 10px; break-inside: avoid; }
