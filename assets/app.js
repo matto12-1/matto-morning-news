@@ -1,10 +1,12 @@
 // assets/app.js — 진입점: 부팅·라우팅·상태·에러 폴백.
 import { loadIndex, loadArticle, pickIssueDate, todayISO } from "./content.js";
-import { renderHome } from "./render.js";
+import { renderHome, renderStory, mountVocabTooltips } from "./render.js";
 import { renderQuiz } from "./quiz.js";
 import { openPrintDialog } from "./print.js";
+import { SPECKLE } from "./art.js";
 import * as tts from "./tts.js";
 
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const app = document.getElementById("app");
 const state = { article: null, level: "lower", view: "home" };
 
@@ -31,15 +33,31 @@ function render() {
   tts.stop();
   app.innerHTML = "";
   if (state.view === "quiz") {
-    app.appendChild(
-      renderQuiz(state.article, {
-        level: state.level,
-        onBack: (why) => {
-          if (why === "quiz-retry") { state.view = "quiz"; render(); }
-          else { state.view = "home"; render(); }
-        },
-      })
-    );
+    const paper = document.createElement("article");
+    paper.className = `paper cat-${state.article.category}`;
+    paper.innerHTML = SPECKLE;
+
+    const split = document.createElement("div");
+    split.className = "quiz-split";
+
+    const readPane = document.createElement("aside");
+    readPane.className = "read-pane";
+    readPane.innerHTML =
+      `<p class="read-h">📖 오늘의 기사 · ${esc(state.article.title)}</p>` +
+      `<div class="read-body">${renderStory(state.article.body[state.level], state.article.vocab)}</div>`;
+    mountVocabTooltips(readPane, state.article.vocab);
+
+    const quizEl = renderQuiz(state.article, {
+      level: state.level,
+      onBack: (why) => {
+        if (why === "quiz-retry") { state.view = "quiz"; render(); }
+        else { state.view = "home"; render(); }
+      },
+    });
+
+    split.append(readPane, quizEl);
+    paper.appendChild(split);
+    app.appendChild(paper);
     window.scrollTo({ top: 0, behavior: "smooth" });
     focusMain(".quiz-title");
     state.booted = true;

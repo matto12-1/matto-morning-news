@@ -60,7 +60,7 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   el.innerHTML = `
     ${SPECKLE}
     <header class="topbar">
-      <span class="brand">${escapeHtml(SITE_NAME)}<span class="brand-meta">${escapeHtml(formatDate(article.date))} · 제 ${article.issueNo} 호</span></span>
+      <span class="brand">${escapeHtml(SITE_NAME)}<span class="brand-meta">${escapeHtml(formatDate(article.date))} · 제 ${article.issueNo} 호 · <span class="credit">made by Matto</span></span></span>
       <div class="controls">
         <div class="level-toggle" role="group" aria-label="학년 선택">
           <button type="button" class="lvl" data-level="lower" aria-pressed="${level === "lower"}">${LEVELS.lower.label}</button>
@@ -73,7 +73,7 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
     <div class="lead">
       <div class="lead-main">
         <div class="badge"><div class="tag"><span class="sm">${escapeHtml(badgeTease)}</span><span class="lg">${SHORT_CAT[cat] || "오늘"} 특집</span></div></div>
-        <p class="intro">${escapeHtml(intro)}<span class="by">글·그림 ${escapeHtml(SITE_NAME)} 편집부</span></p>
+        <p class="intro">${escapeHtml(intro)}</p>
         <div class="cover-title">
           ${article.titleEn ? `<p class="title-en">${escapeHtml(article.titleEn)}</p>` : ""}
           <h1 class="hook">${escapeHtml(article.title)}</h1>
