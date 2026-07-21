@@ -1,8 +1,756 @@
-[
-  { "date": "2026-07-21", "category": "science", "title": "왜 하늘은 파랄까?", "keywords": ["빛", "산란", "무지개", "노을", "대기", "파장"] },
-  { "date": "2026-07-22", "category": "history", "title": "한글은 누가, 왜 만들었을까?", "keywords": ["한글", "세종대왕", "훈민정음", "한자", "백성"] },
-  { "date": "2026-07-23", "category": "literature", "title": "판도라의 상자, 마지막에 남은 것은?", "keywords": ["그리스신화", "판도라", "희망", "호기심"] },
-  { "date": "2026-07-24", "category": "language", "title": "'손이 크다'는 손이 진짜 클까?", "keywords": ["관용어", "속뜻", "손이 크다", "발이 넓다", "우리말"] },
-  { "date": "2026-07-25", "category": "science", "title": "우리 몸속에도 세균이 산다고?", "keywords": ["세균", "유익균", "장", "발효", "소화", "건강"] },
-  { "date": "2026-07-26", "category": "history", "title": "올림픽은 왜 4년마다 열릴까?", "keywords": ["올림픽", "올림피아", "그리스", "휴전", "전통", "스포츠"] }
-]
+{
+  "_comment": "발행 이력 + 다음 순번. 나이틀리 잡이 rotation[nextIndex]로 대주제를 정하고, 발행 후 published에 추가하며 nextIndex를 (nextIndex+1)%rotation.length로 갱신한다. 아래 6편은 런칭 세트(수동 제작).",
+  "nextIndex": 22,
+  "published": [
+    {
+      "date": "2026-07-23",
+      "issueNo": 1,
+      "category": "science",
+      "badgeLabel": "과학·자연",
+      "emoji": "🔬",
+      "title": "왜 하늘은 파랄까?",
+      "keywords": [
+        "산란",
+        "노을",
+        "알갱이",
+        "남색",
+        "대기"
+      ]
+    },
+    {
+      "date": "2026-07-24",
+      "issueNo": 2,
+      "category": "history",
+      "badgeLabel": "역사·사건",
+      "emoji": "🏛",
+      "title": "한글은 누가 만들었을까?",
+      "keywords": [
+        "한자",
+        "훈민정음",
+        "신분",
+        "백성",
+        "집현전"
+      ]
+    },
+    {
+      "date": "2026-07-27",
+      "issueNo": 3,
+      "category": "literature",
+      "badgeLabel": "문학·이야기",
+      "emoji": "📖",
+      "title": "우동 한 그릇, 그 따뜻한 밤",
+      "keywords": [
+        "섣달그믐",
+        "형편",
+        "배려",
+        "사연",
+        "온정"
+      ]
+    },
+    {
+      "date": "2026-07-28",
+      "issueNo": 4,
+      "category": "language",
+      "badgeLabel": "우리말·표현",
+      "emoji": "🗣",
+      "title": "백지장도 맞들면 낫다",
+      "keywords": [
+        "속담",
+        "백지장",
+        "맞들다",
+        "협동",
+        "지혜"
+      ]
+    },
+    {
+      "date": "2026-07-29",
+      "issueNo": 5,
+      "category": "science",
+      "badgeLabel": "날씨·계절",
+      "emoji": "🌦",
+      "title": "천둥은 왜 번개보다 늦게 올까?",
+      "keywords": [
+        "번개",
+        "천둥",
+        "어림",
+        "신호",
+        "전기"
+      ]
+    },
+    {
+      "date": "2026-07-30",
+      "issueNo": 6,
+      "category": "history",
+      "badgeLabel": "우리 문화유산",
+      "emoji": "🏛",
+      "title": "옛날 사람들은 시간을 어떻게 알았을까?",
+      "keywords": [
+        "해시계",
+        "눈금",
+        "앙부일구",
+        "자격루",
+        "영침"
+      ]
+    },
+    {
+      "date": "2026-07-31",
+      "issueNo": 7,
+      "category": "science",
+      "badgeLabel": "과학·자연",
+      "emoji": "🔬",
+      "title": "철새는 어떻게 길을 잃지 않을까?",
+      "keywords": [
+        "철새",
+        "계절",
+        "여름철새",
+        "겨울철새",
+        "자기장"
+      ]
+    },
+    {
+      "date": "2026-08-03",
+      "issueNo": 8,
+      "category": "history",
+      "badgeLabel": "역사·사건",
+      "emoji": "🏛",
+      "title": "경주 첨성대, 별을 보던 탑",
+      "keywords": [
+        "첨성대",
+        "신라",
+        "천문대",
+        "계절",
+        "선덕여왕"
+      ]
+    },
+    {
+      "date": "2026-08-04",
+      "issueNo": 9,
+      "category": "literature",
+      "badgeLabel": "문학·이야기",
+      "emoji": "📖",
+      "title": "해와 달이 된 오누이",
+      "keywords": [
+        "오누이",
+        "홀어머니",
+        "고개",
+        "동아줄",
+        "전래동화"
+      ]
+    },
+    {
+      "date": "2026-08-05",
+      "issueNo": 10,
+      "category": "society",
+      "badgeLabel": "사회·경제",
+      "emoji": "💰",
+      "title": "돈은 어떻게 생겨났을까?",
+      "keywords": [
+        "물물교환",
+        "곡식",
+        "동전",
+        "지폐",
+        "화폐"
+      ]
+    },
+    {
+      "date": "2026-08-06",
+      "issueNo": 11,
+      "category": "science",
+      "badgeLabel": "우주·천문",
+      "emoji": "🪐",
+      "title": "달은 왜 날마다 모양이 바뀔까?",
+      "keywords": [
+        "반사",
+        "초승달",
+        "보름달",
+        "그믐",
+        "위상"
+      ]
+    },
+    {
+      "date": "2026-08-07",
+      "issueNo": 12,
+      "category": "language",
+      "badgeLabel": "우리말·표현",
+      "emoji": "🗣",
+      "title": "'발이 넓다'는 무슨 뜻일까?",
+      "keywords": [
+        "빗대다",
+        "마당발",
+        "두루",
+        "붙임성",
+        "관용어"
+      ]
+    },
+    {
+      "date": "2026-08-10",
+      "issueNo": 13,
+      "category": "mind",
+      "badgeLabel": "마음·감정",
+      "emoji": "💛",
+      "title": "화가 날 때 마음을 다스리는 법",
+      "keywords": [
+        "감정",
+        "신호",
+        "심호흡",
+        "진정",
+        "반응"
+      ]
+    },
+    {
+      "date": "2026-08-11",
+      "issueNo": 14,
+      "category": "tech",
+      "badgeLabel": "발명·기술",
+      "emoji": "💡",
+      "title": "냉장고는 어떻게 음식을 차갑게 할까?",
+      "keywords": [
+        "열",
+        "세균",
+        "보관",
+        "관",
+        "냉매"
+      ]
+    },
+    {
+      "date": "2026-08-12",
+      "issueNo": 15,
+      "category": "science",
+      "badgeLabel": "공룡·화석",
+      "emoji": "🦕",
+      "title": "공룡은 어떻게 화석이 되었을까?",
+      "keywords": [
+        "화석",
+        "흔적",
+        "광물",
+        "발굴",
+        "지층"
+      ]
+    },
+    {
+      "date": "2026-08-13",
+      "issueNo": 16,
+      "category": "history",
+      "badgeLabel": "세계 위인·인물",
+      "emoji": "🌟",
+      "title": "장영실, 노비에서 과학자가 되기까지",
+      "keywords": [
+        "노비",
+        "손재주",
+        "발명",
+        "측우기",
+        "신분"
+      ]
+    },
+    {
+      "date": "2026-08-14",
+      "issueNo": 17,
+      "category": "literature",
+      "badgeLabel": "신화·전설",
+      "emoji": "🐉",
+      "title": "판도라의 상자, 마지막에 남은 것은?",
+      "keywords": [
+        "희망",
+        "항아리",
+        "재앙",
+        "여인",
+        "호기심"
+      ]
+    },
+    {
+      "date": "2026-08-17",
+      "issueNo": 18,
+      "category": "society",
+      "badgeLabel": "직업의 세계",
+      "emoji": "🧑‍🚒",
+      "title": "소방관은 어떤 일을 할까?",
+      "keywords": [
+        "출동",
+        "방화복",
+        "장비",
+        "훈련",
+        "진압"
+      ]
+    },
+    {
+      "date": "2026-08-18",
+      "issueNo": 19,
+      "category": "science",
+      "badgeLabel": "바다·해양 생물",
+      "emoji": "🐳",
+      "title": "고래는 물고기가 아니라고?",
+      "keywords": [
+        "허파",
+        "지느러미",
+        "젖",
+        "흰수염고래",
+        "아가미"
+      ]
+    },
+    {
+      "date": "2026-08-19",
+      "issueNo": 20,
+      "category": "mind",
+      "badgeLabel": "관계·예절",
+      "emoji": "🤝",
+      "title": "'고맙다'는 말의 힘",
+      "keywords": [
+        "고마움",
+        "습관",
+        "급식",
+        "배려",
+        "감사"
+      ]
+    },
+    {
+      "date": "2026-08-20",
+      "issueNo": 21,
+      "category": "art",
+      "badgeLabel": "예술",
+      "emoji": "🎨",
+      "title": "명화 속 색깔의 비밀",
+      "keywords": [
+        "명화",
+        "물감",
+        "표현",
+        "활기",
+        "명암"
+      ]
+    },
+    {
+      "date": "2026-08-21",
+      "issueNo": 22,
+      "category": "science",
+      "badgeLabel": "날씨·계절",
+      "emoji": "🌦",
+      "title": "태풍은 왜 생길까?",
+      "keywords": [
+        "태풍",
+        "에너지",
+        "대비",
+        "폭우",
+        "수증기"
+      ]
+    },
+    {
+      "date": "2026-08-24",
+      "issueNo": 23,
+      "category": "history",
+      "badgeLabel": "우리 문화유산·명절",
+      "emoji": "🎎",
+      "title": "설날에 왜 떡국을 먹을까?",
+      "keywords": [
+        "설날",
+        "명절",
+        "가래떡",
+        "풍습",
+        "음력"
+      ]
+    },
+    {
+      "date": "2026-08-25",
+      "issueNo": 24,
+      "category": "language",
+      "badgeLabel": "사자성어·고사성어",
+      "emoji": "📜",
+      "title": "'우물 안 개구리'는 무슨 뜻일까?",
+      "keywords": [
+        "우물",
+        "빗대다",
+        "자라",
+        "교훈",
+        "사자성어"
+      ]
+    },
+    {
+      "date": "2026-08-26",
+      "issueNo": 25,
+      "category": "society",
+      "badgeLabel": "미디어 읽기",
+      "emoji": "📰",
+      "title": "가짜 뉴스, 어떻게 가려낼까?",
+      "keywords": [
+        "소문",
+        "오해",
+        "의심",
+        "확인",
+        "출처"
+      ]
+    },
+    {
+      "date": "2026-08-27",
+      "issueNo": 26,
+      "category": "science",
+      "badgeLabel": "음식의 과학",
+      "emoji": "🍚",
+      "title": "빵은 어떻게 부풀까?",
+      "keywords": [
+        "이스트",
+        "반죽",
+        "기체",
+        "당분",
+        "효모"
+      ]
+    },
+    {
+      "date": "2026-08-28",
+      "issueNo": 27,
+      "category": "literature",
+      "badgeLabel": "세계 명작·고전",
+      "emoji": "📚",
+      "title": "개미와 베짱이, 그 여름의 선택",
+      "keywords": [
+        "곳간",
+        "여유",
+        "넉넉하다",
+        "곤란",
+        "우화"
+      ]
+    },
+    {
+      "date": "2026-08-31",
+      "issueNo": 28,
+      "category": "mind",
+      "badgeLabel": "생각하는 힘",
+      "emoji": "🤔",
+      "title": "'왜?'라고 묻는 힘",
+      "keywords": [
+        "질문",
+        "궁금증",
+        "발견",
+        "발명가",
+        "호기심"
+      ]
+    },
+    {
+      "date": "2026-09-01",
+      "issueNo": 29,
+      "category": "tech",
+      "badgeLabel": "디지털·AI",
+      "emoji": "🤖",
+      "title": "인공지능은 어떻게 똑똑해질까?",
+      "keywords": [
+        "인공지능",
+        "예시",
+        "학습",
+        "규칙",
+        "데이터"
+      ]
+    },
+    {
+      "date": "2026-09-02",
+      "issueNo": 30,
+      "category": "science",
+      "badgeLabel": "우리 몸·건강",
+      "emoji": "🫀",
+      "title": "잠은 왜 자야 할까?",
+      "keywords": [
+        "피로",
+        "숙면",
+        "기억",
+        "집중",
+        "회복"
+      ]
+    },
+    {
+      "date": "2026-09-03",
+      "issueNo": 31,
+      "category": "history",
+      "badgeLabel": "지리·지도",
+      "emoji": "🗺",
+      "title": "지도는 왜 위쪽이 북쪽일까?",
+      "keywords": [
+        "약속",
+        "북극성",
+        "나침반",
+        "통일",
+        "방위"
+      ]
+    },
+    {
+      "date": "2026-09-04",
+      "issueNo": 32,
+      "category": "science",
+      "badgeLabel": "환경·생태",
+      "emoji": "🌍",
+      "title": "분리수거는 왜 해야 할까?",
+      "keywords": [
+        "분리수거",
+        "금속",
+        "절약",
+        "매립",
+        "재활용"
+      ]
+    },
+    {
+      "date": "2026-09-07",
+      "issueNo": 33,
+      "category": "language",
+      "badgeLabel": "낱말의 유래",
+      "emoji": "🔤",
+      "title": "'시치미를 떼다'는 어디서 왔을까?",
+      "keywords": [
+        "시치미",
+        "꽁지깃",
+        "딴청",
+        "능청",
+        "관용어"
+      ]
+    },
+    {
+      "date": "2026-09-08",
+      "issueNo": 34,
+      "category": "science",
+      "badgeLabel": "수와 퍼즐",
+      "emoji": "🔢",
+      "title": "숫자 0은 어떻게 생겨났을까?",
+      "keywords": [
+        "개수",
+        "수학자",
+        "편리",
+        "자릿수",
+        "발명"
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "issueNo": 35,
+      "category": "society",
+      "badgeLabel": "법과 규칙",
+      "emoji": "⚖️",
+      "title": "규칙은 왜 필요할까?",
+      "keywords": [
+        "규칙",
+        "약속",
+        "안전",
+        "차례",
+        "질서"
+      ]
+    },
+    {
+      "date": "2026-09-10",
+      "issueNo": 36,
+      "category": "science",
+      "badgeLabel": "과학·자연",
+      "emoji": "🔬",
+      "title": "무지개는 어떻게 생길까?",
+      "keywords": [
+        "물방울",
+        "빛깔",
+        "투명",
+        "분수",
+        "굴절"
+      ]
+    },
+    {
+      "date": "2026-09-11",
+      "issueNo": 37,
+      "category": "history",
+      "badgeLabel": "역사·사건",
+      "emoji": "🏛",
+      "title": "팔만대장경, 나무에 새긴 지혜",
+      "keywords": [
+        "대장경",
+        "정성",
+        "지혜",
+        "목판",
+        "경판"
+      ]
+    },
+    {
+      "date": "2026-09-14",
+      "issueNo": 38,
+      "category": "literature",
+      "badgeLabel": "문학·이야기",
+      "emoji": "📖",
+      "title": "흥부와 놀부, 박에서 무엇이 나왔을까?",
+      "keywords": [
+        "전래동화",
+        "정성",
+        "욕심",
+        "금은보화",
+        "우애"
+      ]
+    },
+    {
+      "date": "2026-09-15",
+      "issueNo": 39,
+      "category": "society",
+      "badgeLabel": "사회·경제",
+      "emoji": "💰",
+      "title": "세금은 왜 낼까?",
+      "keywords": [
+        "세금",
+        "시설",
+        "운영",
+        "마련",
+        "공공"
+      ]
+    },
+    {
+      "date": "2026-09-16",
+      "issueNo": 40,
+      "category": "science",
+      "badgeLabel": "우주·천문",
+      "emoji": "🪐",
+      "title": "별똥별은 무엇일까?",
+      "keywords": [
+        "별똥별",
+        "부스러기",
+        "우주",
+        "소원",
+        "유성"
+      ]
+    },
+    {
+      "date": "2026-09-17",
+      "issueNo": 41,
+      "category": "language",
+      "badgeLabel": "우리말·표현",
+      "emoji": "🗣",
+      "title": "가는 말이 고와야 오는 말이 곱다",
+      "keywords": [
+        "말투",
+        "상냥하다",
+        "퉁명스럽다",
+        "다정하다",
+        "속담"
+      ]
+    },
+    {
+      "date": "2026-09-18",
+      "issueNo": 42,
+      "category": "mind",
+      "badgeLabel": "마음·감정",
+      "emoji": "💛",
+      "title": "실수해도 괜찮아",
+      "keywords": [
+        "실수",
+        "위축",
+        "탓",
+        "응원",
+        "도전"
+      ]
+    },
+    {
+      "date": "2026-09-21",
+      "issueNo": 43,
+      "category": "tech",
+      "badgeLabel": "발명·기술",
+      "emoji": "💡",
+      "title": "비행기는 어떻게 하늘을 날까?",
+      "keywords": [
+        "날개",
+        "이륙",
+        "활주로",
+        "조종사",
+        "엔진"
+      ]
+    },
+    {
+      "date": "2026-09-22",
+      "issueNo": 44,
+      "category": "science",
+      "badgeLabel": "공룡·화석",
+      "emoji": "🦕",
+      "title": "공룡은 왜 사라졌을까?",
+      "keywords": [
+        "운석",
+        "멸종",
+        "후손",
+        "화석",
+        "기후"
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "issueNo": 45,
+      "category": "history",
+      "badgeLabel": "세계 위인·인물",
+      "emoji": "🌟",
+      "title": "발명왕 에디슨 이야기",
+      "keywords": [
+        "발명",
+        "호기심",
+        "실험",
+        "전구",
+        "실용"
+      ]
+    },
+    {
+      "date": "2026-09-24",
+      "issueNo": 46,
+      "category": "literature",
+      "badgeLabel": "신화·전설",
+      "emoji": "🐉",
+      "title": "이카로스의 날개, 너무 높이 날면?",
+      "keywords": [
+        "발명가",
+        "깃털",
+        "날개",
+        "욕심",
+        "밀랍"
+      ]
+    },
+    {
+      "date": "2026-09-25",
+      "issueNo": 47,
+      "category": "society",
+      "badgeLabel": "직업의 세계",
+      "emoji": "🧑‍🚒",
+      "title": "요리사는 어떤 일을 할까?",
+      "keywords": [
+        "요리사",
+        "손질",
+        "정성",
+        "신선",
+        "메뉴"
+      ]
+    },
+    {
+      "date": "2026-09-28",
+      "issueNo": 48,
+      "category": "science",
+      "badgeLabel": "바다·해양 생물",
+      "emoji": "🐳",
+      "title": "문어는 왜 먹물을 뿜을까?",
+      "keywords": [
+        "먹물",
+        "무늬",
+        "미로",
+        "재주",
+        "천적"
+      ]
+    },
+    {
+      "date": "2026-09-29",
+      "issueNo": 49,
+      "category": "mind",
+      "badgeLabel": "관계·예절",
+      "emoji": "🤝",
+      "title": "'미안해'라고 말하는 용기",
+      "keywords": [
+        "사과",
+        "용기",
+        "진심",
+        "화해",
+        "변명"
+      ]
+    },
+    {
+      "date": "2026-09-30",
+      "issueNo": 50,
+      "category": "art",
+      "badgeLabel": "예술",
+      "emoji": "🎨",
+      "title": "음악은 왜 기분을 바꿀까?",
+      "keywords": [
+        "경쾌",
+        "위로",
+        "연주",
+        "악기",
+        "멜로디"
+      ]
+    }
+  ]
+}

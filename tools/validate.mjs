@@ -2,7 +2,7 @@
 export const BANNED_WORDS = [
   "살인", "총기", "자살", "성폭력", "마약", "도박", "혐오", "테러", "학살", "음란",
 ];
-const CATS = ["science", "history", "literature", "language"];
+const CATS = ["science", "history", "literature", "language", "tech", "society", "art", "mind"];
 
 export function validateArticle(a) {
   const e = [];
@@ -27,14 +27,34 @@ export function validateArticle(a) {
   (a.vocab || []).forEach((v, i) => req(v && v.word && v.meaning, `vocab[${i}] 낱말/뜻 누락`));
 
   const q = a.quiz || {};
-  req(Array.isArray(q.comprehension) && q.comprehension.length >= 3, "comprehension 3문항 이상");
-  (q.comprehension || []).forEach((x, i) => {
+  // comprehension: 배열(구버전) 또는 { lower, upper }(레벨별) 모두 허용
+  let compItems = [];
+  if (Array.isArray(q.comprehension)) {
+    req(q.comprehension.length >= 3, "comprehension 3문항 이상");
+    compItems = q.comprehension;
+  } else if (q.comprehension && typeof q.comprehension === "object") {
+    req(Array.isArray(q.comprehension.lower) && q.comprehension.lower.length >= 3, "comprehension.lower 3문항 이상");
+    req(Array.isArray(q.comprehension.upper) && q.comprehension.upper.length >= 3, "comprehension.upper 3문항 이상");
+    compItems = [...(q.comprehension.lower || []), ...(q.comprehension.upper || [])];
+  } else {
+    e.push("comprehension 누락");
+  }
+  compItems.forEach((x, i) => {
     req(!!x.question, `comprehension[${i}] 질문 누락`);
     if (x.type === "mc") {
       req(Array.isArray(x.choices) && x.choices.length >= 2, `comprehension[${i}] 보기 부족`);
       req(Number.isInteger(x.answerIndex) && x.answerIndex >= 0 && Array.isArray(x.choices) && x.answerIndex < x.choices.length, `comprehension[${i}] answerIndex 범위`);
     } else if (x.type === "ox") {
       req(typeof x.answer === "boolean", `comprehension[${i}] ox answer 불리언`);
+    } else if (x.type === "cloze") {
+      req(Array.isArray(x.acceptable) && x.acceptable.length >= 1, `comprehension[${i}] cloze acceptable 필요`);
+    } else if (x.type === "multi") {
+      req(Array.isArray(x.choices) && x.choices.length >= 3, `comprehension[${i}] multi 보기 3개 이상`);
+      req(Array.isArray(x.answerIndexes) && x.answerIndexes.length >= 1 &&
+        x.answerIndexes.every((k) => Number.isInteger(k) && k >= 0 && Array.isArray(x.choices) && k < x.choices.length),
+        `comprehension[${i}] multi answerIndexes 범위`);
+    } else if (x.type === "order") {
+      req(Array.isArray(x.steps) && x.steps.length >= 3 && x.steps.every((s) => typeof s === "string" && s.trim()), `comprehension[${i}] order steps 3개 이상`);
     } else {
       e.push(`comprehension[${i}] 알 수 없는 type: ${x.type}`);
     }

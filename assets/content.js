@@ -13,13 +13,21 @@ export function todayISO(offsetMin = TIMEZONE_OFFSET_MIN, now = Date.now()) {
 }
 
 export async function loadIndex() {
-  const r = await fetch("/content/index.json");
+  const r = await fetch("content/index.json");
   if (!r.ok) throw new Error("index.json을 불러올 수 없어요");
   return r.json();
 }
 
 export async function loadArticle(date) {
-  const r = await fetch(`/content/${date}.json`);
+  const r = await fetch(`content/${date}.json`);
   if (!r.ok) throw new Error("기사를 찾을 수 없어요");
   return r.json();
+}
+
+// 지난 호 목록(아카이브용). topics.json의 발행 이력.
+export async function loadManifest() {
+  const r = await fetch("content/topics.json");
+  if (!r.ok) throw new Error("지난 호 목록을 불러올 수 없어요");
+  const j = await r.json();
+  return Array.isArray(j.published) ? j.published : [];
 }

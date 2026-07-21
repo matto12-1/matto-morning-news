@@ -7,6 +7,21 @@ export const gradeMC = (item, idx) => idx === item.answerIndex;
 export const gradeOX = (item, bool) => bool === item.answer;
 export const gradeCloze = (item, text) =>
   Array.isArray(item.acceptable) && item.acceptable.some((a) => normalize(a) === normalize(text));
+// 여러 개 고르기: 고른 인덱스 집합이 정답 집합과 완전히 같아야 정답.
+export const gradeMulti = (item, sel) => {
+  const want = [...new Set(item.answerIndexes || [])].sort((a, b) => a - b).join(",");
+  const got = [...new Set(sel || [])].sort((a, b) => a - b).join(",");
+  return want.length > 0 && want === got;
+};
+// 순서 맞추기: 사용자가 놓은 순서(문자열 배열)가 정답 순서와 같아야 정답.
+export const gradeOrder = (item, arr) =>
+  Array.isArray(arr) && Array.isArray(item.steps) &&
+  arr.length === item.steps.length && arr.every((v, i) => v === item.steps[i]);
+// 선긋기: arr[i] = i번째 낱말에 이은 '원래 뜻 인덱스'. 모든 낱말이 제 뜻(arr[i]===i)에 이어져야 정답.
+export const gradeMatch = (item, arr) => {
+  const n = (item.pairs || []).length;
+  return n > 0 && Array.isArray(arr) && arr.length === n && arr.every((v, i) => v === i);
+};
 
 export function gradeItem(item, answer) {
   switch (item.type) {
@@ -14,6 +29,9 @@ export function gradeItem(item, answer) {
     case "meaning": return gradeMC(item, answer);
     case "ox": return gradeOX(item, answer);
     case "cloze": return gradeCloze(item, answer);
+    case "multi": return gradeMulti(item, answer);
+    case "order": return gradeOrder(item, answer);
+    case "match": return gradeMatch(item, answer);
     default: return false;
   }
 }
@@ -24,163 +42,124 @@ export function scoreSection(items, answers) {
   return { correct, total: items.length };
 }
 
+// 정답을 사람이 읽을 문자열로(결과 화면 '다시 보기'용).
+export function correctText(item) {
+  switch (item.type) {
+    case "mc":
+    case "meaning": return item.choices?.[item.answerIndex] ?? "";
+    case "ox": return item.answer ? "O (맞아요)" : "X (아니에요)";
+    case "cloze": return (item.acceptable || [])[0] || "";
+    case "multi": return (item.answerIndexes || []).map((k) => item.choices?.[k]).join(", ");
+    case "order": return (item.steps || []).join("  →  ");
+    case "match": return (item.pairs || []).map((p) => `${p.word} = ${p.meaning}`).join(" / ");
+    default: return "";
+  }
+}
+
 // ── 2부: 브라우저 렌더 (Node 테스트에서는 import 되지 않는 함수) ──────────────
-// renderQuiz는 DOM API를 쓰므로 브라우저에서만 호출된다.
-export function renderQuiz(article, { level, onBack } = {}) {
-  const q = article.quiz;
+// 한 문제씩 순차 진행. 답하면 즉시 정오 → '다음 문제'. 마지막에 생각 넓히기 → 결과(+틀린 문제 해설).
+export function renderQuiz(article, { level = "lower", onBack } = {}) {
+  const q = article.quiz || {};
+
+  const comp = Array.isArray(q.comprehension)
+    ? q.comprehension
+    : (q.comprehension?.[level] || q.comprehension?.lower || []);
+
+  const shown = shownVocab(article, level);
+  const vocabQs = buildVocabQuestions(shown);
+
+  const graded = [
+    ...comp.map((it) => ({ item: it, section: "내용 이해" })),
+    ...vocabQs.map((it) => ({ item: it, section: "낱말 뜻" })),
+  ];
+  const total = graded.length;
+  const answers = new Array(total);
+  let answered = 0;
+
   const root = document.createElement("section");
   root.className = "quiz";
-  root.innerHTML = `<h2 class="quiz-title">📝 오늘의 퀴즈</h2>
+  root.innerHTML = `
+    <h2 class="quiz-title">📝 오늘의 퀴즈</h2>
     <div class="quiz-progress" role="status" aria-live="polite">
       <div class="qp-bar"><span class="qp-fill" style="width:0%"></span></div>
-      <span class="qp-label">0 / ${q.comprehension.length + q.vocab.length} 문제</span>
-    </div>`;
-
-  const state = { comp: {}, voc: {} };
-  const totalGraded = q.comprehension.length + q.vocab.length;
-  const updateProgress = () => {
-    const done = Object.keys(state.comp).length + Object.keys(state.voc).length;
-    const pct = totalGraded ? Math.round((done / totalGraded) * 100) : 0;
-    const fill = root.querySelector(".qp-fill");
-    const label = root.querySelector(".qp-label");
-    if (fill) fill.style.width = pct + "%";
-    if (label) label.textContent = `${done} / ${totalGraded} 문제`;
-  };
-
-  const compBlock = buildSection("내용 이해", q.comprehension, state.comp, "comp", updateProgress);
-  const vocBlock = buildSection("어휘", q.vocab, state.voc, "voc", updateProgress);
-  root.appendChild(compBlock.el);
-  root.appendChild(vocBlock.el);
-  root.appendChild(buildThink(q.think));
-  if (q.bonus) root.appendChild(buildBonus(q.bonus));
-
-  // 결과 요약
-  const result = document.createElement("div");
-  result.className = "quiz-result";
-  root.appendChild(result);
+      <span class="qp-label">0 / ${total} 문제</span>
+    </div>
+    <div class="quiz-flow"></div>`;
+  const flow = root.querySelector(".quiz-flow");
 
   const footer = document.createElement("div");
   footer.className = "quiz-footer";
-  const doneBtn = button("결과 보기 ⭐", "btn primary big");
-  const retryBtn = button("다시 풀기 🔄", "btn ghost");
   const backBtn = button("← 기사로 돌아가기", "btn ghost");
-  footer.append(doneBtn, retryBtn, backBtn);
+  backBtn.addEventListener("click", () => onBack?.("home"));
+  footer.appendChild(backBtn);
   root.appendChild(footer);
 
-  doneBtn.addEventListener("click", () => {
-    const answered = Object.keys(state.comp).length + Object.keys(state.voc).length;
-    if (answered < totalGraded) {
-      result.innerHTML = `<div class="nudge" role="status">✏️ 아직 ${totalGraded - answered}문제가 남았어요. 다 풀고 별을 받아요!</div>`;
-      result.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
-    }
-    const c = scoreSection(q.comprehension, orderedAnswers(state.comp, q.comprehension.length));
-    const v = scoreSection(q.vocab, orderedAnswers(state.voc, q.vocab.length));
-    const total = c.correct + v.correct;
-    const max = c.total + v.total;
-    const stars = "⭐".repeat(Math.max(1, Math.round((total / max) * 5)));
-    result.innerHTML = `
-      <div class="reward" role="status">
-        <div class="reward-stars">${stars}</div>
-        <p class="reward-msg">${praise(total, max)}</p>
-        <p class="reward-score">내용 ${c.correct}/${c.total} · 어휘 ${v.correct}/${v.total}</p>
-      </div>`;
-    result.querySelector(".reward").animate(
-      [{ transform: "scale(.7)", opacity: 0 }, { transform: "scale(1)", opacity: 1 }],
-      { duration: 400, easing: "cubic-bezier(.2,.9,.3,1.3)" }
+  const setProgress = () => {
+    const pct = total ? Math.round((answered / total) * 100) : 0;
+    root.querySelector(".qp-fill").style.width = pct + "%";
+    root.querySelector(".qp-label").textContent = `${answered} / ${total} 문제`;
+  };
+
+  const swap = (node) => {
+    flow.replaceChildren(node);
+    node.animate?.(
+      [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }],
+      { duration: 220, easing: "ease-out" }
     );
-    result.scrollIntoView({ behavior: "smooth", block: "center" });
-  });
+  };
 
-  retryBtn.addEventListener("click", () => {
-    if (onBack) onBack("quiz-retry");
-  });
-  backBtn.addEventListener("click", () => { if (onBack) onBack("home"); });
-
+  showQuestion(0);
   return root;
 
-  // ── 내부 헬퍼 ──
-  function buildSection(titleText, items, answerStore, ns, notify) {
-    const el = document.createElement("div");
-    el.className = "quiz-section";
-    el.innerHTML = `<h3>${titleText}</h3>`;
-    items.forEach((item, i) => {
-      el.appendChild(buildItem(item, i, answerStore, ns, notify));
-    });
-    return { el };
+  // ── 흐름 ──
+  function showQuestion(i) {
+    if (i >= total) return showThink();
+    swap(buildCard(graded[i], i));
   }
 
-  function buildItem(item, i, answerStore, ns, notify) {
-    const wrap = document.createElement("div");
-    wrap.className = "q-item";
-    wrap.innerHTML = `<p class="q-text"><span class="q-num">${i + 1}</span> ${escapeHtml(item.question)}</p>`;
+  function baseCard(section, i) {
+    const card = document.createElement("div");
+    card.className = "q-item q-card";
+    const count = i >= 0 ? `<span class="q-count">${i + 1} / ${total}</span>` : "";
+    card.innerHTML = `<div class="q-step"><span class="q-pill">${escapeHtml(section)}</span>${count}</div>`;
+    return card;
+  }
+
+  function buildCard({ item, section }, i) {
+    const card = baseCard(section, i);
+    card.insertAdjacentHTML("beforeend", `<p class="q-text">${escapeHtml(item.question)}</p>`);
+
     const feedback = document.createElement("p");
     feedback.className = "q-feedback";
     feedback.setAttribute("aria-live", "polite");
+    const nav = document.createElement("div");
+    nav.className = "q-nav";
 
+    let locked = false;
     const settle = (ok) => {
-      feedback.textContent = (ok ? "정답이에요! " : "다시 생각해볼까요? ") + (item.explain || "");
+      if (locked) return;
+      locked = true;
+      answered++;
+      setProgress();
+      feedback.textContent = (ok ? "정답이에요! " : "아쉬워요. ") + (item.explain || "");
       feedback.className = "q-feedback " + (ok ? "ok" : "no");
-      notify?.();
+      const last = i === total - 1;
+      const next = button(last ? "다 풀었어요! 결과 보기 ⭐" : "다음 문제 →", "btn primary");
+      next.addEventListener("click", () => showQuestion(i + 1));
+      nav.appendChild(next);
+      next.focus({ preventScroll: true });
     };
 
-    if (item.type === "mc" || item.type === "meaning") {
-      const opts = document.createElement("div");
-      opts.className = "q-choices";
-      item.choices.forEach((c, ci) => {
-        const b = button(`${"①②③④⑤".charAt(ci) || ci + 1} ${escapeHtml(c)}`, "choice");
-        b.addEventListener("click", () => {
-          answerStore[i] = ci;
-          [...opts.children].forEach((x) => x.classList.remove("selected", "correct", "wrong"));
-          b.classList.add("selected");
-          const ok = gradeItem(item, ci);
-          b.classList.add(ok ? "correct" : "wrong");
-          if (!ok) opts.children[item.answerIndex]?.classList.add("correct");
-          settle(ok);
-        });
-        opts.appendChild(b);
-      });
-      wrap.appendChild(opts);
-    } else if (item.type === "ox") {
-      const opts = document.createElement("div");
-      opts.className = "q-choices ox";
-      [["O", true], ["X", false]].forEach(([lbl, val]) => {
-        const b = button(lbl, "choice ox-btn");
-        b.addEventListener("click", () => {
-          answerStore[i] = val;
-          [...opts.children].forEach((x) => x.classList.remove("selected", "correct", "wrong"));
-          b.classList.add("selected", gradeItem(item, val) ? "correct" : "wrong");
-          settle(gradeItem(item, val));
-        });
-        opts.appendChild(b);
-      });
-      wrap.appendChild(opts);
-    } else if (item.type === "cloze") {
-      const row = document.createElement("div");
-      row.className = "q-cloze";
-      const input = document.createElement("input");
-      input.type = "text";
-      input.className = "cloze-input";
-      input.setAttribute("aria-label", "정답 입력");
-      input.placeholder = "여기에 답을 써요";
-      const check = button("확인", "btn small");
-      check.addEventListener("click", () => {
-        answerStore[i] = input.value;
-        settle(gradeItem(item, input.value));
-      });
-      input.addEventListener("keydown", (e) => { if (e.key === "Enter") check.click(); });
-      row.append(input, check);
-      wrap.appendChild(row);
-    }
-
-    wrap.appendChild(feedback);
-    return wrap;
+    renderInput(card, item, i, answers, settle);
+    card.append(feedback, nav);
+    return card;
   }
 
-  function buildThink(think) {
-    const el = document.createElement("div");
-    el.className = "quiz-section think";
-    el.innerHTML = `<h3>💭 생각 넓히기</h3><p class="q-text">${escapeHtml(think.question)}</p>`;
+  function showThink() {
+    const think = pickThink(q.think, level);
+    const card = baseCard("💭 생각 넓히기", -1);
+    card.querySelector(".q-pill").classList.add("think-pill");
+    card.insertAdjacentHTML("beforeend", `<p class="q-text">${escapeHtml(think.question)}</p>`);
     const ta = document.createElement("textarea");
     ta.className = "think-input";
     ta.rows = 3;
@@ -195,39 +174,335 @@ export function renderQuiz(article, { level, onBack } = {}) {
       model.hidden = !model.hidden;
       toggle.textContent = model.hidden ? "이렇게 생각해볼 수도 있어요 👀" : "닫기";
     });
-    el.append(ta, toggle, model);
-    return el;
+    const nav = document.createElement("div");
+    nav.className = "q-nav center";
+    const done = button("결과 보기 ⭐", "btn primary big");
+    done.addEventListener("click", showResult);
+    nav.appendChild(done);
+    card.append(ta, toggle, model, nav);
+    swap(card);
   }
 
-  function buildBonus(bonus) {
-    const el = document.createElement("div");
-    el.className = "quiz-section bonus";
-    el.innerHTML = `<h3>🎁 보너스</h3><p class="q-text">${escapeHtml(bonus.question || "")}</p>`;
-    if (bonus.type === "match" && Array.isArray(bonus.pairs)) {
-      const ul = document.createElement("ul");
-      ul.className = "bonus-pairs";
-      bonus.pairs.forEach((p) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<span class="bp-left">${escapeHtml(p.left)}</span><span class="bp-arrow" hidden> → ${escapeHtml(p.right)}</span>`;
-        ul.appendChild(li);
-      });
-      const toggle = button("정답 확인하기 👀", "btn ghost small");
-      toggle.addEventListener("click", () => {
-        const arrows = ul.querySelectorAll(".bp-arrow");
-        const show = arrows[0] && arrows[0].hidden;
-        arrows.forEach((a) => { a.hidden = !show; });
-        toggle.textContent = show ? "닫기" : "정답 확인하기 👀";
-      });
-      el.append(ul, toggle);
+  function showResult() {
+    const c = scoreSection(comp, answers.slice(0, comp.length));
+    const v = scoreSection(vocabQs, answers.slice(comp.length));
+    const got = c.correct + v.correct;
+    const max = c.total + v.total || 1;
+    const stars = "⭐".repeat(Math.max(1, Math.round((got / max) * 5)));
+
+    const card = document.createElement("div");
+    card.className = "quiz-result";
+    card.innerHTML = `
+      <div class="reward" role="status">
+        <div class="reward-stars">${stars}</div>
+        <p class="reward-msg">${praise(got, max)}</p>
+        <p class="reward-score">내용 ${c.correct}/${c.total} · 낱말 ${v.correct}/${v.total}</p>
+      </div>`;
+
+    // 틀린 문제 다시 보기(해설)
+    const wrongHtml = graded.map(({ item }, idx) => {
+      if (gradeItem(item, answers[idx])) return "";
+      return `<div class="wr-item">
+        <p class="wr-q">${escapeHtml(item.question)}</p>
+        <p class="wr-a"><b>정답</b> ${escapeHtml(correctText(item))}</p>
+        ${item.explain ? `<p class="wr-e">${escapeHtml(item.explain)}</p>` : ""}
+      </div>`;
+    }).join("");
+    if (wrongHtml) {
+      const rev = document.createElement("div");
+      rev.className = "wrong-review";
+      rev.innerHTML = `<h3>📌 틀린 문제 다시 보기</h3>${wrongHtml}`;
+      card.appendChild(rev);
+    } else {
+      card.insertAdjacentHTML("beforeend", `<p class="all-correct">🎯 모두 맞혔어요! 아주 훌륭해요.</p>`);
     }
-    return el;
+
+    const nav = document.createElement("div");
+    nav.className = "q-nav center";
+    const retry = button("다시 풀기 🔄", "btn ghost");
+    retry.addEventListener("click", () => onBack?.("quiz-retry"));
+    nav.appendChild(retry);
+    card.appendChild(nav);
+
+    swap(card);
+    card.querySelector(".reward").animate(
+      [{ transform: "scale(.7)", opacity: 0 }, { transform: "scale(1)", opacity: 1 }],
+      { duration: 400, easing: "cubic-bezier(.2,.9,.3,1.3)" }
+    );
+  }
+
+  // ── 유형별 입력 렌더 ──
+  function renderInput(card, item, i, answers, settle) {
+    const marker = (ci) => "①②③④⑤".charAt(ci) || `${ci + 1}`;
+
+    if (item.type === "mc" || item.type === "meaning") {
+      const opts = choiceBox(item.choices, marker);
+      [...opts.children].forEach((b, ci) => b.addEventListener("click", () => {
+        if (b.disabled) return;
+        answers[i] = ci;
+        const ok = gradeItem(item, ci);
+        b.classList.add("selected", ok ? "correct" : "wrong");
+        if (!ok) opts.children[item.answerIndex]?.classList.add("correct");
+        [...opts.children].forEach((x) => { if (x !== b) x.disabled = true; });
+        settle(ok);
+      }));
+      card.appendChild(opts);
+
+    } else if (item.type === "ox") {
+      const opts = document.createElement("div");
+      opts.className = "q-choices ox";
+      [["O", true], ["X", false]].forEach(([lbl, val]) => {
+        const b = button(lbl, "choice ox-btn");
+        b.addEventListener("click", () => {
+          if (b.disabled) return;
+          answers[i] = val;
+          const ok = gradeItem(item, val);
+          b.classList.add("selected", ok ? "correct" : "wrong");
+          [...opts.children].forEach((x) => { if (x !== b) x.disabled = true; });
+          settle(ok);
+        });
+        opts.appendChild(b);
+      });
+      card.appendChild(opts);
+
+    } else if (item.type === "cloze") {
+      const row = document.createElement("div");
+      row.className = "q-cloze";
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "cloze-input";
+      input.setAttribute("aria-label", "정답 입력");
+      input.placeholder = "여기에 답을 써요";
+      const check = button("확인", "btn small");
+      const submit = () => {
+        if (check.disabled) return;
+        answers[i] = input.value;
+        input.disabled = true; check.disabled = true;
+        settle(gradeItem(item, input.value));
+      };
+      check.addEventListener("click", submit);
+      input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+      row.append(input, check);
+      card.appendChild(row);
+
+    } else if (item.type === "multi") {
+      const opts = choiceBox(item.choices, marker);
+      const picked = new Set();
+      [...opts.children].forEach((b, ci) => b.addEventListener("click", () => {
+        if (b.disabled) return;
+        if (picked.has(ci)) { picked.delete(ci); b.classList.remove("picked"); }
+        else { picked.add(ci); b.classList.add("picked"); }
+        check.disabled = picked.size === 0;
+      }));
+      const hint = document.createElement("p");
+      hint.className = "q-hint";
+      hint.textContent = "정답을 모두 고른 뒤 확인을 눌러요.";
+      const check = button("확인", "btn small");
+      check.disabled = true;
+      check.addEventListener("click", () => {
+        if (check.disabled) return;
+        answers[i] = [...picked];
+        const ok = gradeItem(item, answers[i]);
+        [...opts.children].forEach((x, ci) => {
+          x.disabled = true;
+          const isAns = (item.answerIndexes || []).includes(ci);
+          if (isAns) x.classList.add("correct");
+          else if (picked.has(ci)) x.classList.add("wrong");
+        });
+        check.disabled = true;
+        settle(ok);
+      });
+      const foot = document.createElement("div");
+      foot.className = "q-confirm";
+      foot.append(hint, check);
+      card.append(opts, foot);
+
+    } else if (item.type === "order") {
+      const steps = shuffle(item.steps || []);
+      const seq = [];
+      const pool = document.createElement("div");
+      pool.className = "order-pool";
+      const seqWrap = document.createElement("div");
+      seqWrap.className = "order-seq-wrap";
+      const seqEl = document.createElement("ol");
+      seqEl.className = "order-seq";
+      const empty = document.createElement("p");
+      empty.className = "order-empty";
+      empty.textContent = "위 조각을 순서대로 눌러요 ↓";
+      seqWrap.append(empty, seqEl);
+      const drawSeq = () => {
+        seqEl.replaceChildren(...seq.map((s) => { const li = document.createElement("li"); li.textContent = s; return li; }));
+        empty.hidden = seq.length > 0;
+      };
+      const check = button("확인", "btn small");
+      const reset = button("다시", "btn ghost small");
+      check.disabled = true;
+      (item.steps || []).length && steps.forEach((s) => {
+        const chip = button(s, "order-chip");
+        chip.addEventListener("click", () => {
+          if (chip.disabled) return;
+          seq.push(s); chip.disabled = true; chip.classList.add("used"); drawSeq();
+          check.disabled = seq.length !== steps.length;
+        });
+        pool.appendChild(chip);
+      });
+      reset.addEventListener("click", () => {
+        if (reset.disabled) return;
+        seq.length = 0; drawSeq();
+        [...pool.children].forEach((c) => { c.disabled = false; c.classList.remove("used"); });
+        check.disabled = true;
+      });
+      check.addEventListener("click", () => {
+        if (check.disabled) return;
+        answers[i] = seq.slice();
+        [...pool.children].forEach((c) => { c.disabled = true; });
+        reset.disabled = true; check.disabled = true;
+        settle(gradeItem(item, answers[i]));
+      });
+      const ctrls = document.createElement("div");
+      ctrls.className = "order-ctrls";
+      ctrls.append(reset, check);
+      card.append(pool, seqWrap, ctrls);
+
+    } else if (item.type === "match") {
+      const pairs = item.pairs || [];
+      const n = pairs.length;
+      const arr = new Array(n).fill(-1);         // 낱말 i -> 이은 뜻의 원래 인덱스
+      answers[i] = arr;
+      const meanOrder = shuffle(pairs.map((_, idx) => idx)); // 뜻 표시 순서(섞음)
+      const PC = ["pair-a", "pair-b", "pair-c", "pair-d", "pair-e"];
+      const allPC = ["pair-a", "pair-b", "pair-c", "pair-d", "pair-e"];
+      let active = -1, locked2 = false;
+
+      const wrap = document.createElement("div"); wrap.className = "match";
+      const wordsCol = document.createElement("div"); wordsCol.className = "match-col";
+      const meansCol = document.createElement("div"); meansCol.className = "match-col";
+      const wordBtns = [], meanBtns = [];
+
+      const redraw = () => {
+        wordBtns.forEach((b, wi) => {
+          b.classList.remove("active", "linked", ...allPC);
+          if (arr[wi] >= 0) b.classList.add("linked", PC[wi]);
+          if (wi === active) b.classList.add("active");
+        });
+        meanBtns.forEach((b) => {
+          const orig = Number(b.dataset.orig);
+          const wi = arr.indexOf(orig);
+          const badge = b.querySelector(".match-badge");
+          b.classList.remove("linked", ...allPC);
+          if (wi >= 0) { b.classList.add("linked", PC[wi]); badge.textContent = wi + 1; badge.hidden = false; }
+          else { badge.hidden = true; }
+        });
+        check.disabled = arr.some((v) => v < 0);
+      };
+
+      pairs.forEach((p, wi) => {
+        const b = button(`${"①②③④⑤".charAt(wi) || wi + 1}  ${p.word}`, "match-item word");
+        b.addEventListener("click", () => {
+          if (locked2) return;
+          active = (active === wi) ? -1 : wi;
+          redraw();
+        });
+        wordBtns.push(b);
+        wordsCol.appendChild(b);
+      });
+
+      meanOrder.forEach((orig) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "match-item mean"; b.dataset.orig = orig;
+        b.innerHTML = `<span class="mi-text">${escapeHtml(pairs[orig].meaning)}</span><span class="match-badge" hidden></span>`;
+        b.addEventListener("click", () => {
+          if (locked2 || active < 0) return;
+          const prevW = arr.indexOf(orig);   // 이 뜻에 이미 이어진 낱말 해제
+          if (prevW >= 0) arr[prevW] = -1;
+          arr[active] = orig;                // active 낱말을 이 뜻에 연결(기존 연결은 덮어씀)
+          active = -1;
+          redraw();
+        });
+        meanBtns.push(b);
+        meansCol.appendChild(b);
+      });
+
+      wrap.append(wordsCol, meansCol);
+
+      const hint = document.createElement("p");
+      hint.className = "q-hint";
+      hint.textContent = "낱말을 누르고, 알맞은 뜻을 눌러 이어요.";
+      const check = button("확인", "btn small");
+      check.disabled = true;
+      check.addEventListener("click", () => {
+        if (check.disabled || locked2) return;
+        locked2 = true;
+        meanBtns.forEach((b) => {
+          const orig = Number(b.dataset.orig);
+          const wi = arr.indexOf(orig);
+          b.disabled = true;
+          b.classList.remove("linked", ...allPC);
+          if (wi >= 0) b.classList.add(wi === orig ? "correct" : "wrong");
+        });
+        wordBtns.forEach((b) => { b.disabled = true; });
+        check.disabled = true;
+        settle(gradeMatch(item, arr));
+      });
+      const foot = document.createElement("div");
+      foot.className = "q-confirm";
+      foot.append(hint, check);
+      card.append(wrap, foot);
+      redraw();
+    }
+  }
+
+  function choiceBox(choices, marker) {
+    const opts = document.createElement("div");
+    opts.className = "q-choices";
+    (choices || []).forEach((c, ci) => opts.appendChild(button(`${marker(ci)} ${c}`, "choice")));
+    return opts;
   }
 }
 
-function orderedAnswers(store, len) {
-  const arr = new Array(len);
-  for (let i = 0; i < len; i++) arr[i] = store[i];
-  return arr;
+// ── 낱말 문제 생성 헬퍼 ──
+function shownVocab(article, level) {
+  const body = article.body?.[level];
+  const text = Array.isArray(body) ? body.map((s) => s.text || s).join("\n") : String(body || "");
+  return (article.vocab || []).filter((v) => v.word && text.includes(v.word));
+}
+
+// 낱말을 4개씩 균형 있게 묶어 '선긋기(짝 잇기)' 문제로 만든다. (모든 낱말을 한두 문제로 해결)
+function buildVocabQuestions(vocab) {
+  const groups = chunkBalanced(vocab, 4).filter((g) => g.length >= 2);
+  const multi = groups.length > 1;
+  return groups.map((g, gi) => ({
+    type: "match",
+    question: multi ? `낱말과 알맞은 뜻을 이어 보세요. (${gi + 1})` : "낱말과 알맞은 뜻을 이어 보세요.",
+    pairs: g.map((v) => ({ word: v.word, meaning: v.meaning })),
+    explain: g.map((v) => `${v.word}: ${v.meaning}`).join(" / "),
+  }));
+}
+
+// n개를 최대 maxSize로 최대한 고르게 나눈다. 예) 8→[4,4], 7→[4,3], 5→[3,2].
+function chunkBalanced(arr, maxSize) {
+  const n = arr.length;
+  if (n <= maxSize) return n ? [arr] : [];
+  const groups = Math.ceil(n / maxSize);
+  const size = Math.ceil(n / groups);
+  const out = [];
+  for (let i = 0; i < n; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function pickThink(think, level) {
+  if (!think) return { question: "", modelAnswer: "" };
+  if (think.lower || think.upper) return think[level] || think.lower || think.upper;
+  return think;
 }
 
 function praise(score, max) {

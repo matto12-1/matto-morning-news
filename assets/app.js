@@ -1,6 +1,6 @@
 // assets/app.js — 진입점: 부팅·라우팅·상태·에러 폴백.
-import { loadIndex, loadArticle, pickIssueDate, todayISO } from "./content.js";
-import { renderHome, renderStory, mountVocabTooltips } from "./render.js";
+import { loadIndex, loadArticle, loadManifest, pickIssueDate, todayISO } from "./content.js";
+import { renderHome, renderArchive, renderStory, mountVocabTooltips } from "./render.js";
 import { renderQuiz } from "./quiz.js";
 import { openPrintDialog } from "./print.js";
 import { SPECKLE } from "./art.js";
@@ -32,6 +32,16 @@ async function boot() {
 function render() {
   tts.stop();
   app.innerHTML = "";
+  if (state.view === "archive") {
+    const arch = renderArchive(state.manifest || [], {
+      onOpen: (date) => openIssue(date),
+      onClose: () => { state.view = "home"; render(); },
+    });
+    app.appendChild(arch);
+    window.scrollTo({ top: 0 });
+    state.booted = true;
+    return;
+  }
   if (state.view === "quiz") {
     const paper = document.createElement("article");
     paper.className = `paper cat-${state.article.category}`;
@@ -46,6 +56,7 @@ function render() {
       `<p class="read-h">📖 오늘의 기사 · ${esc(state.article.title)}</p>` +
       `<div class="read-body">${renderStory(state.article.body[state.level], state.article.vocab)}</div>`;
     mountVocabTooltips(readPane, state.article.vocab);
+    enableDragScroll(readPane);
 
     const quizEl = renderQuiz(state.article, {
       level: state.level,
@@ -70,6 +81,7 @@ function render() {
       onLevelChange: (lvl) => { state.level = lvl; render(); },
       onStartQuiz: () => { state.view = "quiz"; render(); },
       onPrint: () => openPrintDialog(state.article, state.level),
+      onArchive: () => openArchive(),
     },
   });
   app.appendChild(home);
@@ -108,6 +120,50 @@ function wireFontToggle(root) {
     const on = document.documentElement.classList.toggle("bigfont");
     btn.setAttribute("aria-pressed", String(on));
   });
+}
+
+// 마우스로 본문을 잡고 끌어서 스크롤(클릭&드래그). 터치는 네이티브 스크롤에 맡긴다.
+function enableDragScroll(el) {
+  let down = false, moved = false, startY = 0, startTop = 0, suppress = false;
+  // 실제로 끈 뒤 발생하는 클릭(낱말 팝업 등)은 한 번 삼킨다.
+  el.addEventListener("click", (e) => {
+    if (suppress) { e.stopPropagation(); e.preventDefault(); suppress = false; }
+  }, true);
+  el.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    down = true; moved = false; suppress = false;
+    startY = e.clientY; startTop = el.scrollTop;
+    try { el.setPointerCapture(e.pointerId); } catch { /* noop */ }
+  });
+  el.addEventListener("pointermove", (e) => {
+    if (!down) return;
+    const dy = e.clientY - startY;
+    if (!moved && Math.abs(dy) > 4) { moved = true; el.classList.add("dragging"); }
+    if (moved) { el.scrollTop = startTop - dy; e.preventDefault(); }
+  });
+  const end = () => {
+    if (!down) return;
+    down = false;
+    if (moved) { moved = false; suppress = true; el.classList.remove("dragging"); }
+  };
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+}
+
+async function openArchive() {
+  try { if (!state.manifest) state.manifest = await loadManifest(); }
+  catch { state.manifest = []; }
+  state.view = "archive";
+  render();
+}
+
+async function openIssue(date) {
+  try {
+    state.article = await loadArticle(date);
+    state.level = "lower";
+    state.view = "home";
+    render();
+  } catch (err) { renderError(err); }
 }
 
 function renderEmpty() {
