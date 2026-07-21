@@ -172,7 +172,9 @@ function renderEmpty() {
       <div class="fallback-emoji">🛌</div>
       <h2>오늘은 신문이 쉬어가요</h2>
       <p>내일 아침 새로운 이야기로 다시 만나요!</p>
+      <button type="button" class="btn primary" id="empty-archive">🗂 지난 호 보기</button>
     </div>`;
+  app.querySelector("#empty-archive")?.addEventListener("click", openArchive);
 }
 
 function renderError(err) {
