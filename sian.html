@@ -14,7 +14,7 @@
     --round:"Jua", "Pretendard", sans-serif;
     --sans:"Pretendard Variable", Pretendard, system-ui, sans-serif;
   }
-  body{ margin:0; font-family:var(--sans); color:var(--ink); background:#dceefb; }
+  body{ margin:0; font-family:var(--sans); color:var(--ink); background:#dceefb; word-break:keep-all; overflow-wrap:break-word; }
   .spread{
     position:relative; max-width:1180px; margin:0 auto; overflow:hidden;
     background:
@@ -67,7 +67,8 @@
   .redhead .mark{ color:var(--ink); }
   .cols{ column-count:2; column-gap:40px; font-size:1.12rem; line-height:1.9; color:var(--body); text-align:left; }
   .cols p{ margin:0 0 1em; }
-  .cols .drop::first-letter{ font-family:var(--round); color:var(--coral); font-size:3.1em; line-height:.72; float:left; margin:.02em .1em 0 0; }
+  /* 리드 문장 강조(드롭캡 대신 — 정렬 안정적) */
+  .cols p.drop::first-line{ font-weight:800; }
   .vocab{ color:var(--ink); font-weight:800; box-shadow:inset 0 -.36em 0 #FFDD84; }
 
   /* 청록 겹테두리 콜아웃 */
@@ -103,15 +104,6 @@
 
   <!-- 배지 -->
   <div class="badge">
-    <svg class="bowl" viewBox="0 0 90 64" aria-hidden="true">
-      <ellipse cx="45" cy="46" rx="40" ry="15" fill="#E7E2D6"/>
-      <path d="M8 44 Q45 66 82 44 L78 40 Q45 56 12 40Z" fill="#C9C2B2"/>
-      <g>
-        <circle cx="30" cy="34" r="9" fill="#F6C445"/><circle cx="47" cy="30" r="9" fill="#EE5A36"/>
-        <circle cx="62" cy="35" r="9" fill="#F0A83C"/><circle cx="40" cy="24" r="8" fill="#F6C445"/>
-        <circle cx="55" cy="23" r="8" fill="#EE5A36"/>
-      </g>
-    </svg>
     <div class="tag"><span class="sm">하늘의 비밀을 파헤쳐요</span><span class="lg">과학 특집</span></div>
   </div>
 
