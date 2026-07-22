@@ -60,6 +60,8 @@ function render() {
 
     const quizEl = renderQuiz(state.article, {
       level: state.level,
+      recommend: pickRecommendations(state.manifest || [], state.article),
+      onOpenIssue: (date) => openIssue(date),
       onBack: (why) => {
         if (why === "quiz-retry") { state.view = "quiz"; render(); }
         else { state.view = "home"; render(); }
@@ -79,7 +81,11 @@ function render() {
     level: state.level,
     handlers: {
       onLevelChange: (lvl) => { state.level = lvl; render(); },
-      onStartQuiz: () => { state.view = "quiz"; render(); },
+      onStartQuiz: async () => {
+        // 결과 화면의 '다음 기사 추천'에 쓸 지난 호 목록을 미리 확보(실패해도 퀴즈는 진행).
+        if (!state.manifest) { try { state.manifest = await loadManifest(); } catch { state.manifest = []; } }
+        state.view = "quiz"; render();
+      },
       onPrint: () => openPrintDialog(state.article, state.level),
       onArchive: () => openArchive(),
     },
@@ -150,6 +156,16 @@ function enableDragScroll(el) {
   el.addEventListener("pointercancel", end);
 }
 
+// 결과 화면 추천: 오늘까지 발행된 다른 호에서 같은 갈래 1편 + 다른 갈래 랜덤으로 최대 3편.
+function pickRecommendations(manifest, article, count = 3) {
+  const today = todayISO();
+  const pool = manifest.filter((it) => it.date <= today && it.date !== article.date);
+  const shuffle = (a) => a.map((v) => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(([, v]) => v);
+  const same = shuffle(pool.filter((it) => it.category === article.category));
+  const rest = shuffle(pool.filter((it) => it.category !== article.category));
+  return shuffle([...same.slice(0, 1), ...rest].slice(0, count));
+}
+
 async function openArchive() {
   try { if (!state.manifest) state.manifest = await loadManifest(); }
   catch { state.manifest = []; }
@@ -166,7 +182,7 @@ async function openIssue(date) {
   } catch (err) { renderError(err); }
 }
 
-function renderEmpty() {
+async function renderEmpty() {
   app.innerHTML = `
     <div class="fallback">
       <div class="fallback-emoji">🛌</div>
@@ -175,6 +191,20 @@ function renderEmpty() {
       <button type="button" class="btn primary" id="empty-archive">🗂 지난 호 보기</button>
     </div>`;
   app.querySelector("#empty-archive")?.addEventListener("click", openArchive);
+  // 곧 나올 다음 호가 있으면 표지·제목을 예고로 보여준다(실패해도 기본 화면 유지).
+  try {
+    const manifest = await loadManifest();
+    const today = todayISO();
+    const next = [...manifest].filter((it) => it.date > today).sort((a, b) => a.date.localeCompare(b.date))[0];
+    const btn = app.querySelector("#empty-archive");
+    if (!next || !btn) return;
+    btn.insertAdjacentHTML("beforebegin", `
+      <div class="empty-preview">
+        <span class="ep-label">곧 만나요 · 다음 이야기 👀</span>
+        <span class="arch-thumb"><img src="content/img/${esc(next.date)}.jpg" alt="" loading="lazy" onerror="this.parentElement.remove()"></span>
+        <span class="ep-t">${esc(next.title)}</span>
+      </div>`);
+  } catch { /* 예고 없이 기본 화면 유지 */ }
 }
 
 function renderError(err) {

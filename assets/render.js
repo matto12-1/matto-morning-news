@@ -132,6 +132,7 @@ export function renderArchive(manifest, today, { onOpen, onClose } = {}) {
   const cats = [...new Set(items.map((it) => it.category))];
   const card = (it) => `
     <button type="button" class="arch-card cat-${escapeHtml(it.category)}" data-date="${escapeHtml(it.date)}" data-cat="${escapeHtml(it.category)}">
+      <span class="arch-thumb"><img src="content/img/${escapeHtml(it.date)}.jpg" alt="" loading="lazy" onerror="this.parentElement.remove()"></span>
       <span class="arch-badge">${escapeHtml(it.emoji || "📄")} ${escapeHtml(it.badgeLabel || "")}</span>
       <span class="arch-t">${escapeHtml(it.title)}</span>
       <span class="arch-d">${formatDate(it.date)} · 제 ${it.issueNo}호</span>

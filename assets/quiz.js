@@ -58,7 +58,7 @@ export function correctText(item) {
 
 // ── 2부: 브라우저 렌더 (Node 테스트에서는 import 되지 않는 함수) ──────────────
 // 한 문제씩 순차 진행. 답하면 즉시 정오 → '다음 문제'. 마지막에 생각 넓히기 → 결과(+틀린 문제 해설).
-export function renderQuiz(article, { level = "lower", onBack } = {}) {
+export function renderQuiz(article, { level = "lower", onBack, recommend = [], onOpenIssue } = {}) {
   const q = article.quiz || {};
 
   const comp = Array.isArray(q.comprehension)
@@ -215,6 +215,21 @@ export function renderQuiz(article, { level = "lower", onBack } = {}) {
       card.appendChild(rev);
     } else {
       card.insertAdjacentHTML("beforeend", `<p class="all-correct">🎯 모두 맞혔어요! 아주 훌륭해요.</p>`);
+    }
+
+    // 다음 기사 추천(지난 호가 있을 때만)
+    if (recommend.length && onOpenIssue) {
+      const rec = document.createElement("div");
+      rec.className = "quiz-recs";
+      rec.innerHTML = `<h3>📚 다음엔 이런 이야기 어때요?</h3>
+        <div class="rec-grid">${recommend.map((it) => `
+          <button type="button" class="arch-card rec-card cat-${escapeHtml(it.category)}" data-date="${escapeHtml(it.date)}">
+            <span class="arch-thumb"><img src="content/img/${escapeHtml(it.date)}.jpg" alt="" loading="lazy" onerror="this.parentElement.remove()"></span>
+            <span class="arch-badge">${escapeHtml(it.emoji || "📄")} ${escapeHtml(it.badgeLabel || "")}</span>
+            <span class="arch-t">${escapeHtml(it.title)}</span>
+          </button>`).join("")}</div>`;
+      rec.querySelectorAll(".rec-card").forEach((b) => b.addEventListener("click", () => onOpenIssue(b.dataset.date)));
+      card.appendChild(rec);
     }
 
     const nav = document.createElement("div");
