@@ -148,11 +148,13 @@ export function renderArchive(manifest, today, { onOpen, onClose } = {}) {
       <div class="controls"><button type="button" class="tbtn" id="arch-close">← 오늘 호로</button></div>
     </header>
     <h1 class="arch-title">🗂 지난 호</h1>
-    ${items.length ? `<p class="arch-sub">읽고 싶은 날의 신문을 골라 보세요. 위에서 갈래별로 모아 볼 수 있어요.</p>` : ""}
-    ${chips}
-    ${items.length
-      ? `<div class="arch-grid">${items.map(card).join("")}</div>`
-      : `<p class="arch-empty">아직 지난 호가 없어요.<br>내일부터 새 신문이 하루에 하나씩 쌓여요! 📚</p>`}`;
+    ${items.length ? `<p class="arch-sub">읽고 싶은 날의 신문을 골라 보세요. 갈래를 누르면 주제별로 모아 볼 수 있어요.</p>` : ""}
+    <div class="arch-layout">
+      ${chips}
+      ${items.length
+        ? `<div class="arch-grid">${items.map(card).join("")}</div>`
+        : `<p class="arch-empty">아직 지난 호가 없어요.<br>내일부터 새 신문이 하루에 하나씩 쌓여요! 📚</p>`}
+    </div>`;
   el.querySelector("#arch-close").addEventListener("click", () => onClose?.());
   el.querySelectorAll(".arch-card").forEach((b) => b.addEventListener("click", () => onOpen?.(b.dataset.date)));
   el.querySelectorAll(".arch-chip").forEach((chip) => chip.addEventListener("click", () => {

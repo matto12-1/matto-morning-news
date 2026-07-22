@@ -251,7 +251,16 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .rec-card{ min-height:0; padding:12px 13px; gap:5px; }
 .rec-card .arch-t{ font-size:1.02rem; }
 /* 카테고리 필터 칩 */
+.arch-layout{ position:relative; z-index:6; }
 .arch-filter{ position:relative; z-index:6; display:flex; flex-wrap:wrap; gap:8px; margin:0 0 20px; }
+/* 와이드 화면: 좌측 여백을 카테고리 사이드바로 활용 + 카드 폭 상한 확대(1240→1680px) */
+@media (min-width:1400px){
+  .paper.archive{ padding-left:max(52px, calc((100% - 1680px)/2)); padding-right:max(52px, calc((100% - 1680px)/2)); }
+  .archive .topbar{ max-width:1680px; }
+  .arch-layout:has(.arch-filter){ display:grid; grid-template-columns:200px 1fr; gap:26px; align-items:start; } /* 빈 상태(칩 없음)는 그리드 미적용 */
+  .arch-layout .arch-filter{ position:sticky; top:18px; flex-direction:column; align-items:stretch; gap:7px; margin:0; }
+  .arch-layout .arch-chip{ text-align:left; padding:9px 16px; }
+}
 .arch-chip{ font-family:var(--round); font-size:.92rem; border:2px solid #e2ddce; background:#fff; color:var(--body); border-radius:999px; padding:7px 16px; cursor:pointer; transition:border-color .12s, background .12s, color .12s; }
 .arch-chip:hover{ border-color:var(--accent); color:var(--accent); }
 .arch-chip.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
