@@ -82,7 +82,7 @@ export function renderQuiz(article, { level = "lower", onBack } = {}) {
     <h1 class="quiz-title">📝 오늘의 퀴즈</h1>
     <div class="quiz-progress" role="status" aria-live="polite">
       <div class="qp-bar"><span class="qp-fill" style="width:0%"></span></div>
-      <span class="qp-label">0 / ${total} 문제</span>
+      <span class="qp-label">푼 문제 0 / ${total}</span>
     </div>
     <div class="quiz-flow"></div>`;
   const flow = root.querySelector(".quiz-flow");
@@ -97,7 +97,7 @@ export function renderQuiz(article, { level = "lower", onBack } = {}) {
   const setProgress = () => {
     const pct = total ? Math.round((answered / total) * 100) : 0;
     root.querySelector(".qp-fill").style.width = pct + "%";
-    root.querySelector(".qp-label").textContent = `${answered} / ${total} 문제`;
+    root.querySelector(".qp-label").textContent = `푼 문제 ${answered} / ${total}`;
   };
 
   const swap = (node) => {
@@ -120,7 +120,7 @@ export function renderQuiz(article, { level = "lower", onBack } = {}) {
   function baseCard(section, i) {
     const card = document.createElement("div");
     card.className = "q-item q-card";
-    const count = i >= 0 ? `<span class="q-count">${i + 1} / ${total}</span>` : "";
+    const count = i >= 0 ? `<span class="q-count">${i + 1}번 문제</span>` : "";
     card.innerHTML = `<div class="q-step"><span class="q-pill">${escapeHtml(section)}</span>${count}</div>`;
     return card;
   }

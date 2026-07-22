@@ -75,7 +75,7 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .hook{ font-family:var(--round); color:var(--accent); font-size:clamp(2.4rem,5.6vw,3.9rem); line-height:1.05; margin:0; text-shadow:3px 3px 0 #fff, 5px 5px 0 rgba(0,0,0,.06); }
 .subtitle{ font-family:var(--round); color:var(--ink); font-size:clamp(1.3rem,3vw,2rem); line-height:1.2; margin:.15em 0 0; }
 /* 제목류만 어절 단위 줄바꿈(본문은 기본값 — 오른쪽 끝이 고르게) */
-.hook, .subtitle, .redhead, .title-en, .tag .lg, .quiz-title, .brand{ word-break:keep-all; }
+.hook, .subtitle, .redhead, .title-en, .tag .lg, .quiz-title, .brand, .q-text, .choice{ word-break:keep-all; }
 /* 제목류 줄 길이를 균형 있게(윗줄·아랫줄 비슷하게) */
 .hook, .subtitle, .redhead, .q-text{ text-wrap:balance; }
 .toc{ background:#fff; border:2.5px solid var(--accent2); border-radius:18px; padding:14px 18px 12px; box-shadow:0 5px 0 rgba(0,0,0,.05); }
@@ -259,7 +259,7 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .modal-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
 
 /* 폴백 */
-.fallback{ position:relative; z-index:6; text-align:center; padding:70px 20px; }
+.fallback{ position:relative; z-index:6; text-align:center; padding:40px 20px; display:grid; place-content:center; justify-items:center; gap:2px; min-height:62vh; }
 .fallback-emoji{ font-size:3.2rem; }
 .fallback h2{ font-family:var(--round); margin:14px 0 6px; }
 .fallback p{ color:var(--body); }
@@ -267,9 +267,14 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 @media (max-width:820px){
   .cols{ column-count:1; }
   .lead{ flex-direction:column; align-items:stretch; gap:20px; }
-  .lead-main{ max-width:none; }
+  .lead-main{ max-width:none; flex-basis:auto; }
   .lead-side{ flex-basis:auto; }
-  .img-slot{ aspect-ratio:16/9; }
+  /* 컬럼 플렉스에서 슬롯의 aspect-ratio(%폭 기반)는 부모 인트린식 높이 계산에 반영되지 않아
+     .lead-side가 border 6px로 붕괴하고 이미지가 .story 뒤에 깔린다.
+     이미지를 흐름 안(static)으로 되돌려 이미지 자신이 높이를 만들게 한다. */
+  .img-slot{ aspect-ratio:auto; }
+  .img-slot:not(:has(.cover-img)){ aspect-ratio:auto; min-height:180px; }
+  .cover-img{ position:static; inset:auto; height:auto; aspect-ratio:16/9; }
 }
 @media (max-width:480px){ .paper{ padding:14px 15px 50px; } .story,.quiz{ padding:8px 16px 22px; } }
 @media (prefers-reduced-motion:reduce){ *{ animation:none!important; scroll-behavior:auto!important; transition:none!important; } }
