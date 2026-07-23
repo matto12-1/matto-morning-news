@@ -390,8 +390,6 @@ export function renderQuiz(article, { level = "lower", onBack, recommend = [], o
       let active = -1, locked2 = false;
 
       const wrap = document.createElement("div"); wrap.className = "match";
-      const wordsCol = document.createElement("div"); wordsCol.className = "match-col";
-      const meansCol = document.createElement("div"); meansCol.className = "match-col";
       const wordBtns = [], meanBtns = [];
 
       const redraw = () => {
@@ -419,7 +417,6 @@ export function renderQuiz(article, { level = "lower", onBack, recommend = [], o
           redraw();
         });
         wordBtns.push(b);
-        wordsCol.appendChild(b);
       });
 
       meanOrder.forEach((orig) => {
@@ -435,10 +432,10 @@ export function renderQuiz(article, { level = "lower", onBack, recommend = [], o
           redraw();
         });
         meanBtns.push(b);
-        meansCol.appendChild(b);
       });
 
-      wrap.append(wordsCol, meansCol);
+      // 낱말·뜻을 한 그리드에 행 단위로 배치 — 같은 행은 높이를 공유(뜻이 길어도 행이 어긋나지 않음)
+      wordBtns.forEach((w, k) => wrap.append(w, meanBtns[k]));
 
       const hint = document.createElement("p");
       hint.className = "q-hint";

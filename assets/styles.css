@@ -210,8 +210,7 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 
 /* 선긋기(짝 잇기) */
 .match{ display:grid; grid-template-columns:minmax(0,auto) 1fr; gap:9px 16px; align-items:stretch; }
-.match-col{ display:flex; flex-direction:column; gap:9px; }
-.match-item{ position:relative; text-align:left; font:inherit; background:#faf6ee; border:2px solid #ece3d1; border-radius:12px; padding:11px 40px 11px 14px; cursor:pointer; min-height:46px; transition:border-color .12s, box-shadow .12s; }
+.match-item{ position:relative; display:flex; align-items:center; text-align:left; font:inherit; background:#faf6ee; border:2px solid #ece3d1; border-radius:12px; padding:11px 40px 11px 14px; cursor:pointer; min-height:46px; transition:border-color .12s, box-shadow .12s; }
 .match-item.word{ font-family:var(--round); white-space:nowrap; }
 .match-item:hover:not(:disabled){ border-color:var(--accent); }
 .match-item.active{ border-color:var(--ink); box-shadow:0 0 0 2px var(--ink) inset; }
