@@ -513,8 +513,9 @@ function shuffle(arr) {
 
 function pickThink(think, level) {
   if (!think) return { question: "", modelAnswer: "" };
-  if (think.lower || think.upper) return think[level] || think.lower || think.upper;
-  return think;
+  if (think[level] && think[level].question) return think[level]; // 해당 학년 전용 질문
+  if (think.question) return think;                                // 평면 기본(공통)
+  return think.lower || think.upper || think.sprout || { question: "", modelAnswer: "" };
 }
 
 function praise(score, max) {

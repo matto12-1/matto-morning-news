@@ -21,8 +21,8 @@ export function openPrintDialog(article, defaultLevel = "lower") {
       <h3>🖨️ 인쇄하기</h3>
       <label class="field">학년
         <select id="pr-level">
-          <option value="lower" ${defaultLevel === "lower" ? "selected" : ""}>${LEVELS.lower.label}(${LEVELS.lower.sub})</option>
-          <option value="upper" ${defaultLevel === "upper" ? "selected" : ""}>${LEVELS.upper.label}(${LEVELS.upper.sub})</option>
+          <option value="lower" ${defaultLevel === "lower" ? "selected" : ""}>${LEVELS.lower.label}</option>
+          <option value="upper" ${defaultLevel === "upper" ? "selected" : ""}>${LEVELS.upper.label}</option>
         </select>
       </label>
       <label class="field">종류
@@ -78,11 +78,15 @@ export function buildWorksheetHtml(article, level, mode) {
   let n = 0;
   const compHtml = comp.map((it) => renderQ(++n, it, teacher)).join("");
   const vocHtml = (q.vocab || []).map((it) => renderQ(++n, it, teacher)).join("");
+  // think: 해당 학년 전용 질문이 있으면 그것, 없으면 평면 기본.
+  const th = q.think || {};
+  const think = (th[level] && th[level].question) ? th[level]
+    : (th.question ? th : (th.lower || th.upper || th.sprout || {}));
   const thinkHtml = `
     <div class="pw-q">
-      <p class="pw-qtext"><b>${++n}.</b> ${esc(q.think.question)}</p>
+      <p class="pw-qtext"><b>${++n}.</b> ${esc(think.question)}</p>
       <div class="pw-lines"></div>
-      ${teacher ? `<p class="pw-ans">💡 예시 답안: ${esc(q.think.modelAnswer)}</p>` : ""}
+      ${teacher ? `<p class="pw-ans">💡 예시 답안: ${esc(think.modelAnswer)}</p>` : ""}
     </div>`;
 
   return `
@@ -92,7 +96,7 @@ export function buildWorksheetHtml(article, level, mode) {
         <div class="pw-fill">이름 __________  학년/반 __________  ${teacher ? "<b>[교사용 정답지]</b>" : ""}</div>
       </div>
       <h1 class="pw-title">${esc(article.title)}</h1>
-      <p class="pw-sub">${esc(article.subtitle)} · ${LEVELS[level].label}(${LEVELS[level].sub})</p>
+      <p class="pw-sub">${esc(article.subtitle)} · ${LEVELS[level].label}</p>
       <div class="pw-body">${bodyToHtml(article.body[level])}</div>
       <hr />
       <h2 class="pw-h2">📝 내용 이해</h2>${compHtml}

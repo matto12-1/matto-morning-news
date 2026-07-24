@@ -22,6 +22,8 @@ export function validateArticle(a) {
   };
   req(a.body && bodyOk(a.body.lower), "body.lower 누락/형식오류(문자열 또는 섹션 배열)");
   req(a.body && bodyOk(a.body.upper), "body.upper 누락/형식오류(문자열 또는 섹션 배열)");
+  // sprout(1·2학년)은 선택. 있으면 형식만 검증.
+  if (a.body && a.body.sprout != null) req(bodyOk(a.body.sprout), "body.sprout 형식오류(문자열 또는 섹션 배열)");
 
   req(Array.isArray(a.vocab) && a.vocab.length >= 3, "vocab 3개 이상 필요");
   (a.vocab || []).forEach((v, i) => req(v && v.word && v.meaning, `vocab[${i}] 낱말/뜻 누락`));
@@ -36,6 +38,11 @@ export function validateArticle(a) {
     req(Array.isArray(q.comprehension.lower) && q.comprehension.lower.length >= 3, "comprehension.lower 3문항 이상");
     req(Array.isArray(q.comprehension.upper) && q.comprehension.upper.length >= 3, "comprehension.upper 3문항 이상");
     compItems = [...(q.comprehension.lower || []), ...(q.comprehension.upper || [])];
+    // sprout(1·2학년) 문항은 선택. 있으면 2문항 이상 + 구조 검증.
+    if (q.comprehension.sprout != null) {
+      req(Array.isArray(q.comprehension.sprout) && q.comprehension.sprout.length >= 2, "comprehension.sprout 2문항 이상");
+      compItems = [...compItems, ...(q.comprehension.sprout || [])];
+    }
   } else {
     e.push("comprehension 누락");
   }
@@ -74,7 +81,16 @@ export function validateArticle(a) {
     }
   });
 
-  req(q.think && q.think.question && q.think.modelAnswer, "think 문항(질문/모범답안) 누락");
+  // think: 평면({question,modelAnswer}) 또는 학년별({sprout?,lower,upper}) 모두 허용.
+  const th = q.think;
+  if (th && (th.sprout || th.lower || th.upper)) {
+    ["sprout", "lower", "upper"].forEach((lv) => {
+      if (th[lv] != null) req(th[lv].question && th[lv].modelAnswer, `think.${lv} 질문/모범답안 누락`);
+    });
+    req(th.question || th.lower || th.upper, "think에 기본 질문 또는 lower/upper 단계 필요");
+  } else {
+    req(th && th.question && th.modelAnswer, "think 문항(질문/모범답안) 누락");
+  }
 
   const blob = JSON.stringify(a);
   BANNED_WORDS.forEach((w) => { if (blob.includes(w)) e.push(`금칙어 포함: ${w}`); });

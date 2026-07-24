@@ -1,5 +1,5 @@
 // assets/render.js — 어린이 잡지 시안 결의 홈/기사 렌더.
-import { SITE_NAME, CATEGORY_LABELS, LEVELS } from "./config.js";
+import { SITE_NAME, CATEGORY_LABELS, LEVELS, LEVEL_ORDER } from "./config.js";
 import { SPECKLE } from "./art.js";
 
 const escapeHtml = (s) =>
@@ -10,6 +10,13 @@ const SHORT_CAT = {
   science: "과학", history: "역사", literature: "문학", language: "우리말",
   tech: "기술", society: "사회", art: "예술", mind: "마음",
 };
+
+// 팩트박스: 학년별 override({sprout:{title,text}})가 있으면 그 단계, 없으면 기본 {title,text}.
+function pickFactbox(fb, level) {
+  if (!fb) return null;
+  if (fb[level] && fb[level].text) return fb[level];
+  return fb;
+}
 
 export function formatDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
@@ -66,6 +73,7 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
   const intro = article.intro || article.subtitle || "";
   const badgeTease = article.badgeTease || "함께 알아봐요";
   const badgeLabel = article.badgeLabel || SHORT_CAT[cat] || "오늘"; // 대주제 라벨(있으면), 없으면 계열 약칭
+  const fb = pickFactbox(article.factbox, level); // 학년별 팩트박스
 
   el.innerHTML = `
     ${SPECKLE}
@@ -73,8 +81,9 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
       <span class="brand">${escapeHtml(SITE_NAME)}<span class="brand-meta">${escapeHtml(formatDate(article.date))} · 제 ${article.issueNo} 호 · <span class="credit">made by Matto</span></span></span>
       <div class="controls">
         <div class="level-toggle" role="group" aria-label="학년 선택">
-          <button type="button" class="lvl" data-level="lower" aria-pressed="${level === "lower"}">${LEVELS.lower.label}</button>
-          <button type="button" class="lvl" data-level="upper" aria-pressed="${level === "upper"}">${LEVELS.upper.label}</button>
+          ${LEVEL_ORDER.filter((k) => article.body?.[k]).map((k) =>
+            `<button type="button" class="lvl" data-level="${k}" aria-pressed="${level === k}">${escapeHtml(LEVELS[k].tab)}</button>`
+          ).join("")}
         </div>
         <button type="button" class="tbtn" id="archive-btn">🗂 지난 호</button>
         <button type="button" class="tbtn" id="print-btn">🖨 인쇄</button>
@@ -101,10 +110,10 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
 
     <div class="story">
       <div id="article-body">${renderStory(article.body[level], article.vocab)}</div>
-      ${article.factbox ? `<aside class="callout">
+      ${fb ? `<aside class="callout">
         <svg class="ic" viewBox="0 0 60 60" aria-hidden="true"><circle cx="26" cy="26" r="18" fill="none" stroke="currentColor" stroke-width="6"/><line x1="39" y1="39" x2="54" y2="54" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></svg>
-        <h3>${escapeHtml(article.factbox.title)}</h3>
-        <p>${escapeHtml(article.factbox.text)}</p>
+        <h3>${escapeHtml(fb.title || "콕! 알아두기")}</h3>
+        <p>${escapeHtml(fb.text)}</p>
       </aside>` : ""}
     </div>
 

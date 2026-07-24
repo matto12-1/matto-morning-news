@@ -32,6 +32,8 @@ async function boot() {
 function render() {
   tts.stop();
   app.innerHTML = "";
+  // 현재 기사에 없는 학년 단계(예: 1·2학년 미제작 호)면 저학년으로 폴백.
+  if (state.article?.body && !state.article.body[state.level]) state.level = "lower";
   if (state.view === "archive") {
     const arch = renderArchive(state.manifest || [], todayISO(), {
       onOpen: (date) => openIssue(date),

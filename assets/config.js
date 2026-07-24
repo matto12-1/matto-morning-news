@@ -17,8 +17,11 @@ export const CATEGORY_EMOJI = {
   language: "🈶",
 };
 
-// 난이도 라벨
+// 난이도 라벨. sprout(1·2학년)은 기사에 body.sprout이 있을 때만 노출되는 선택 단계.
 export const LEVELS = {
-  lower: { key: "lower", label: "저학년", sub: "3·4학년" },
-  upper: { key: "upper", label: "고학년", sub: "5·6학년" },
+  sprout: { key: "sprout", label: "1·2학년", sub: "1·2학년", tab: "1·2학년" },
+  lower: { key: "lower", label: "3·4학년", sub: "3·4학년", tab: "3·4학년" },
+  upper: { key: "upper", label: "5·6학년", sub: "5·6학년", tab: "5·6학년" },
 };
+// 토글 노출 순서(낮은 학년부터).
+export const LEVEL_ORDER = ["sprout", "lower", "upper"];
