@@ -170,6 +170,12 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .q-feedback{ margin:11px 0 0; font-size:.95rem; font-weight:700; }
 .q-feedback.ok{ color:#2f855a; } .q-feedback.no{ color:#c53030; }
 .think-model{ background:#fff7ea; border-left:4px solid var(--accent); padding:11px 14px; border-radius:10px; margin:10px 0 0; }
+.think-hint{ margin:2px 0 10px; font-size:.9rem; color:var(--ink-3); }
+.think-self{ margin-top:10px; }
+.think-self-q{ margin:0 0 8px; font-weight:700; font-size:.95rem; }
+.think-self-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.think-self-row .picked{ background:var(--accent); color:#fff; border-color:var(--accent); }
+.think-self-msg{ margin:8px 0 0; font-weight:700; color:#2f855a; }
 .bonus-pairs{ list-style:none; padding:0; margin:0 0 10px; display:grid; gap:8px; }
 .bonus-pairs li{ background:#faf6ee; border:2px solid #ece3d1; border-radius:12px; padding:11px 14px; font-weight:700; }
 .bp-arrow{ color:var(--accent); font-weight:800; }

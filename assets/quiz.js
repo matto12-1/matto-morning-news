@@ -163,23 +163,69 @@ export function renderQuiz(article, { level = "lower", onBack, recommend = [], o
     const ta = document.createElement("textarea");
     ta.className = "think-input";
     ta.rows = 3;
-    ta.placeholder = "정답이 없는 질문이에요. 자유롭게 내 생각을 써봐요.";
+    ta.placeholder = "정답이 없는 질문이에요. 내 생각을 한 문장 써 봐요.";
     ta.setAttribute("aria-label", "생각 넓히기 답");
+
+    const MIN = 5; // 최소 성의: 빈칸·장난 답이 그냥 넘어가지 않게(채점은 안 함)
+    const hint = document.createElement("p");
+    hint.className = "think-hint";
+    hint.textContent = "내 생각을 한 문장 써 보면 결과를 볼 수 있어요.";
+
+    // 다 쓰면 열리는 '예시답안 + 자기점검' 묶음
+    const reveal = document.createElement("div");
+    reveal.className = "think-reveal";
+    reveal.hidden = true;
     const toggle = button("이렇게 생각해볼 수도 있어요 👀", "btn ghost small");
     const model = document.createElement("p");
     model.className = "think-model";
     model.hidden = true;
     model.textContent = think.modelAnswer;
-    toggle.addEventListener("click", () => {
-      model.hidden = !model.hidden;
-      toggle.textContent = model.hidden ? "이렇게 생각해볼 수도 있어요 👀" : "닫기";
+    const self = document.createElement("div");
+    self.className = "think-self";
+    self.hidden = true;
+    const selfMsg = document.createElement("p");
+    selfMsg.className = "think-self-msg";
+    selfMsg.setAttribute("aria-live", "polite");
+    const bSame = button("네, 담겼어요 😊", "btn ghost small");
+    const bDiff = button("조금 달라요 🤔", "btn ghost small");
+    bSame.addEventListener("click", () => {
+      selfMsg.textContent = "좋아요! 예시와 비슷하게 생각했네요. 스스로 견주어 본 게 멋져요.";
+      bSame.classList.add("picked"); bDiff.classList.remove("picked");
     });
+    bDiff.addEventListener("click", () => {
+      selfMsg.textContent = "괜찮아요! 다르게 생각한 것도 훌륭해요. 내 생각을 가진 게 가장 소중해요.";
+      bDiff.classList.add("picked"); bSame.classList.remove("picked");
+    });
+    const selfRow = document.createElement("div");
+    selfRow.className = "think-self-row";
+    selfRow.append(bSame, bDiff);
+    const selfQ = document.createElement("p");
+    selfQ.className = "think-self-q";
+    selfQ.textContent = "내 답에도 이런 생각이 담겼나요?";
+    self.append(selfQ, selfRow, selfMsg);
+    toggle.addEventListener("click", () => {
+      const open = model.hidden; // 지금 열리는가
+      model.hidden = !open;
+      self.hidden = !open;
+      toggle.textContent = open ? "닫기" : "이렇게 생각해볼 수도 있어요 👀";
+    });
+    reveal.append(toggle, model, self);
+
+    const done = button("결과 보기 ⭐", "btn primary big");
+    done.disabled = true;
+    const gate = () => {
+      const ok = ta.value.replace(/\s/g, "").length >= MIN;
+      done.disabled = !ok;
+      hint.hidden = ok;
+      reveal.hidden = !ok; // 한 문장 쓰면 예시답안 비교가 열림
+    };
+    ta.addEventListener("input", gate);
+    done.addEventListener("click", showResult);
+
     const nav = document.createElement("div");
     nav.className = "q-nav center";
-    const done = button("결과 보기 ⭐", "btn primary big");
-    done.addEventListener("click", showResult);
     nav.appendChild(done);
-    card.append(ta, toggle, model, nav);
+    card.append(ta, hint, reveal, nav);
     swap(card);
   }
 
