@@ -157,7 +157,8 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .q-num{ font-family:var(--round); color:var(--accent2); font-size:1.3rem; line-height:1.1; flex:0 0 auto; }
 .q-choices{ display:grid; gap:8px; }
 .q-choices.ox{ grid-template-columns:1fr 1fr; gap:12px; }
-.choice{ text-align:left; font:inherit; background:#faf6ee; border:2px solid #ece3d1; border-radius:12px; padding:12px 14px; cursor:pointer; min-height:46px; }
+/* color를 명시하지 않으면 iOS 사파리가 버튼 글자를 시스템 파랑으로 칠한다 */
+.choice{ text-align:left; font:inherit; color:var(--ink); -webkit-text-fill-color:currentColor; background:#faf6ee; border:2px solid #ece3d1; border-radius:12px; padding:12px 14px; cursor:pointer; min-height:46px; }
 .choice:hover{ border-color:var(--accent); }
 .choice.selected{ border-color:var(--ink); }
 .choice.correct{ background:#e7f6ec; border-color:#38a169; color:#1c7a43; font-weight:700; }
@@ -205,7 +206,7 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 
 /* 순서 맞추기 */
 .order-pool{ display:flex; flex-wrap:wrap; gap:8px; }
-.order-chip{ text-align:left; font:inherit; background:#faf6ee; border:2px solid #ece3d1; border-radius:12px; padding:10px 14px; cursor:pointer; min-height:44px; }
+.order-chip{ text-align:left; font:inherit; color:var(--ink); -webkit-text-fill-color:currentColor; background:#faf6ee; border:2px solid #ece3d1; border-radius:12px; padding:10px 14px; cursor:pointer; min-height:44px; }
 .order-chip:hover{ border-color:var(--accent); }
 .order-chip.used{ opacity:.35; text-decoration:line-through; cursor:default; }
 .order-seq-wrap{ margin-top:12px; background:#fff; border:2px dashed var(--accent2); border-radius:14px; padding:10px 14px; min-height:52px; }
@@ -216,7 +217,7 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 
 /* 선긋기(짝 잇기) */
 .match{ display:grid; grid-template-columns:minmax(0,auto) 1fr; gap:9px 16px; align-items:stretch; }
-.match-item{ position:relative; display:flex; align-items:center; text-align:left; font:inherit; background:#faf6ee; border:2px solid #ece3d1; border-radius:12px; padding:11px 40px 11px 14px; cursor:pointer; min-height:46px; transition:border-color .12s, box-shadow .12s; }
+.match-item{ position:relative; display:flex; align-items:center; text-align:left; font:inherit; color:var(--ink); -webkit-text-fill-color:currentColor; background:#faf6ee; border:2px solid #ece3d1; border-radius:12px; padding:11px 40px 11px 14px; cursor:pointer; min-height:46px; transition:border-color .12s, box-shadow .12s; }
 .match-item.word{ font-family:var(--round); white-space:nowrap; }
 .match-item:hover:not(:disabled){ border-color:var(--accent); }
 .match-item.active{ border-color:var(--ink); box-shadow:0 0 0 2px var(--ink) inset; }
@@ -231,7 +232,7 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .arch-title{ position:relative; z-index:6; font-family:var(--round); color:var(--accent); font-size:2rem; margin:10px 0 2px; }
 .arch-sub{ position:relative; z-index:6; color:var(--body); margin:0 0 20px; font-weight:600; }
 .arch-grid{ position:relative; z-index:6; display:grid; grid-template-columns:repeat(auto-fill, minmax(238px,1fr)); gap:16px; }
-.arch-card{ text-align:left; font:inherit; background:var(--cream); border:0; border-left:6px solid var(--c,#ccc); border-radius:14px; padding:15px 17px; cursor:pointer; box-shadow:0 6px 18px rgba(60,80,130,.10); display:flex; flex-direction:column; gap:7px; min-height:122px; transition:transform .1s ease, box-shadow .1s ease; }
+.arch-card{ text-align:left; font:inherit; color:var(--ink); -webkit-text-fill-color:currentColor; background:var(--cream); border:0; border-left:6px solid var(--c,#ccc); border-radius:14px; padding:15px 17px; cursor:pointer; box-shadow:0 6px 18px rgba(60,80,130,.10); display:flex; flex-direction:column; gap:7px; min-height:122px; transition:transform .1s ease, box-shadow .1s ease; }
 .arch-card:hover{ transform:translateY(-3px); box-shadow:0 12px 26px rgba(60,80,130,.16); }
 .arch-badge{ font-family:var(--round); font-size:.85rem; color:var(--c,#666); }
 .arch-t{ font-family:var(--round); font-size:1.2rem; color:var(--ink); line-height:1.22; word-break:keep-all; }
