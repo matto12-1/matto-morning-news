@@ -1,6 +1,7 @@
 // tools/gen-image.mjs — 기사 1편의 표지 일러스트를 Gemini(gemini-2.5-flash-image, 나노바나나)로 생성.
 // 사용: node tools/gen-image.mjs 2026-08-19
 import fs from "node:fs/promises";
+import { buildImagePrompt } from "./img-prompt.mjs";
 
 const KEY = process.env.GEMINI_API_KEY;
 if (!KEY) { console.error("GEMINI_API_KEY 없음"); process.exit(1); }
@@ -10,14 +11,8 @@ if (!date) { console.error("날짜 인자 필요 (예: 2026-08-19)"); process.ex
 
 const a = JSON.parse(await fs.readFile(`content/${date}.json`, "utf8"));
 
-// 아이들 잡지풍 플랫 일러스트, 글자 없이, 3:2 가로.
-const prompt =
-  `Editorial illustration for a warm Korean children's magazine, for elementary students (ages 9-12). ` +
-  `Topic: "${a.titleEn}" — ${a.title}. ${a.subtitle || ""}. ` +
-  `Style: friendly flat-vector storybook illustration with soft grain texture, bright but gentle pastel colors, ` +
-  `cozy and clean, one clear central subject, simple uncluttered background, soft warm lighting. ` +
-  `Composition: landscape 3:2, subject centered. ` +
-  `VERY IMPORTANT: absolutely NO text, NO letters, NO words, NO numbers, NO captions or labels anywhere in the image.`;
+// 아이들 잡지풍 플랫 일러스트, 글자 없이, 3:2 가로, 기사 내용과 관련된 장면.
+const prompt = buildImagePrompt(a);
 
 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${KEY}`;
 const res = await fetch(url, {

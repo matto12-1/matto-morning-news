@@ -10,7 +10,8 @@ const scene =
 const palette =
   "Overall palette and background: soft, light, airy, low-saturation warm cream and gentle peach pastel tones, " +
   "so it blends smoothly into a warm pastel magazine page. Landscape composition, subject centered, simple and uncluttered. " +
-  "VERY IMPORTANT: absolutely NO text, NO letters, NO words, NO numbers, NO captions anywhere.";
+  "ABSOLUTELY NO TEXT OF ANY KIND: no Korean characters, no English letters or words, no numbers, no punctuation symbols drawn as glyphs, " +
+  "no captions, no labels, no signage, no logos, no writing on any surface.";
 
 const styles = [
   { name: "flat", text: "Flat-vector storybook illustration with subtle grain texture, clean shapes, gentle shading." },

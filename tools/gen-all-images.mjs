@@ -4,28 +4,17 @@
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import sharp from "sharp";
+import { buildImagePrompt } from "./img-prompt.mjs";
 
 const KEY = process.env.GEMINI_API_KEY;
 if (!KEY) { console.error("GEMINI_API_KEY 없음"); process.exit(1); }
 const LIMIT = Number(process.argv[2] || 15);
 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${KEY}`;
 
-const CAT = {
-  science: "science and nature", history: "history and culture", literature: "a gentle storybook scene",
-  tech: "technology and invention", society: "everyday society and life", art: "art and music",
-  mind: "feelings and a mindful heart", language: "Korean words and expressions",
-};
-
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function genOne(a) {
-  const prompt =
-    `Editorial illustration for a warm Korean children's magazine, for elementary students (ages 9-12). ` +
-    `Theme: ${CAT[a.category] || "learning"}. Topic: "${a.titleEn}" — ${a.title}. ${a.subtitle || ""}. ` +
-    `Style: flat-vector storybook illustration with subtle grain texture, clean rounded shapes, gentle soft shading, cheerful and friendly. ` +
-    `Overall palette and background: soft, light, airy, low-saturation warm cream and gentle pastel tones, so it blends into a warm pastel page. ` +
-    `Composition: landscape, one clear central subject, simple uncluttered background, soft warm lighting. ` +
-    `VERY IMPORTANT: absolutely NO text, NO letters, NO words, NO numbers, NO captions or labels anywhere in the image.`;
+  const prompt = buildImagePrompt(a);
   for (let attempt = 1; attempt <= 4; attempt++) {
     try {
       const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });

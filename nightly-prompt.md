@@ -73,6 +73,9 @@
 ### 그 밖의 필드
 `titleEn` · `badgeTease` · `subtitle` · `intro`(2~4문장) · `readingTimeMin{ sprout:2, lower, upper }` · `source` · `illustration:null`.
 - 이미지 슬롯은 비워 둔다(나중에 Gemini 이미지로 채움). `badgeLabel`은 대주제 이름.
+- 이미지 생성은 이 문서 범위가 아니다. `tools/gen-all-images.mjs`(공용 프롬프트: `tools/img-prompt.mjs`)가
+  맡으며, **글자·기호 절대 금지 + 기사 내용과의 시각적 관련성 필수** 규칙은 `CLAUDE.md` 참고
+  (2026-08-07 영어/깨진 한글 텍스트 삽입 사고 이후 강화됨). 이미지 생성 후에는 육안 검수 필수.
 
 ## 스키마 정본
 `content/2026-07-23.json`(과학편)이 세 단계가 모두 든 현행 정본이다. 필드·구조·문항 유형·낱말 배치(저4/고8)·sprout 5요소를 그대로 본떠라.
