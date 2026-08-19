@@ -519,15 +519,15 @@ export function renderQuiz(article, { level = "lower", onBack, recommend = [], o
 }
 
 // ── 낱말 문제 생성 헬퍼 ──
-function shownVocab(article, level) {
+export function shownVocab(article, level) {
   const body = article.body?.[level];
   const text = Array.isArray(body) ? body.map((s) => s.text || s).join("\n") : String(body || "");
   return (article.vocab || []).filter((v) => v.word && text.includes(v.word));
 }
 
 // 낱말을 4개씩 균형 있게 묶어 '선긋기(짝 잇기)' 문제로 만든다. (모든 낱말을 한두 문제로 해결)
-function buildVocabQuestions(vocab) {
-  const groups = chunkBalanced(vocab, 4).filter((g) => g.length >= 2);
+export function buildVocabQuestions(vocab, maxPerGroup = 4) {
+  const groups = chunkBalanced(vocab, maxPerGroup).filter((g) => g.length >= 2);
   const multi = groups.length > 1;
   return groups.map((g, gi) => ({
     type: "match",

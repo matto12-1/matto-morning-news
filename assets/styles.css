@@ -289,6 +289,16 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .modal .field{ display:block; margin:0 0 14px; font-weight:800; font-size:.9rem; }
 .modal select{ display:block; width:100%; margin-top:6px; padding:10px; border:2px solid #ece3d1; border-radius:12px; font:inherit; min-height:44px; }
 .modal-actions{ display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
+.modal .btn[disabled]{ opacity:.45; cursor:not-allowed; }
+/* 인쇄 모달: 본문/문제 고르기 + 여러 호 고르기 */
+.pr-parts{ border:2px solid #ece3d1; border-radius:12px; padding:10px 12px 12px; }
+.pr-parts legend{ padding:0 6px; font-size:.82rem; color:var(--ink-3); }
+.pr-parts label, .pr-issues label{ display:flex; align-items:center; gap:8px; font-weight:600; font-size:.9rem; min-height:32px; cursor:pointer; }
+.pr-parts input, .pr-issues input{ width:18px; height:18px; accent-color:var(--accent); flex:none; }
+.pr-more summary{ cursor:pointer; min-height:32px; display:flex; align-items:center; gap:6px; }
+.pr-more .pr-count{ font-weight:600; color:var(--ink-3); font-size:.82rem; }
+.pr-issues{ max-height:180px; overflow:auto; margin-top:8px; padding:6px 10px; border:2px solid #ece3d1; border-radius:12px; }
+.pr-issues label{ font-weight:500; }
 
 /* 폴백 */
 .fallback{ position:relative; z-index:6; text-align:center; padding:40px 20px; display:grid; place-content:center; justify-items:center; gap:2px; min-height:62vh; }

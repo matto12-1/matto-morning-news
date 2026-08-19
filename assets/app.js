@@ -88,7 +88,11 @@ function render() {
         if (!state.manifest) { try { state.manifest = await loadManifest(); } catch { state.manifest = []; } }
         state.view = "quiz"; render();
       },
-      onPrint: () => openPrintDialog(state.article, state.level),
+      onPrint: async () => {
+        // '여러 호 함께 인쇄'에 쓸 지난 호 목록(실패해도 이번 호 인쇄는 된다).
+        if (!state.manifest) { try { state.manifest = await loadManifest(); } catch { state.manifest = []; } }
+        openPrintDialog(state.article, state.level, { manifest: state.manifest, today: todayISO(), loadArticle });
+      },
       onArchive: () => openArchive(),
     },
   });

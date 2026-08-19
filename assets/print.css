@@ -1,35 +1,124 @@
-/* assets/print.css — 인쇄 전용 A4 워크시트 */
-@page { size: A4; margin: 14mm 14mm; }
+/* assets/print.css — 인쇄 전용 A4 워크시트.
+   학교 흑백 레이저 기준. 배경색을 쓰지 않는다(브라우저가 배경 그래픽을 기본으로 인쇄하지 않음).
+   위계는 굵기·크기·괘선·여백으로만 만든다. */
+@page { size: A4; margin: 13mm 14mm 10mm; }
 
-@media print {
-  /* 화면 UI 숨기고 인쇄물만 */
-  body.printing #app { display: none !important; }
-  body.printing #print-root { display: block !important; }
-  .modal-back { display: none !important; }
+/* 화면 UI를 숨기고 인쇄물만 보이게 */
+body.printing #app { display: none !important; }
+body.printing #print-root { display: block !important; }
+.modal-back { display: none !important; }
+html, body { background: #fff !important; }
+a[href]:after { content: ""; }
 
-  html, body { background: #fff !important; color: #000; font-size: 11.5pt; }
-  a[href]:after { content: ""; }
-}
-
-/* 워크시트 레이아웃(화면에서도 동일 규칙 사용) */
 #print-root { color: #000; font-family: "Pretendard", system-ui, sans-serif; }
-.worksheet { line-height: 1.6; }
-.pw-head { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; padding-bottom: 6px; flex-wrap: wrap; gap: 6px; }
-.pw-brand { font-weight: 800; font-size: 12pt; }
-.pw-brand span { font-weight: 500; font-size: 9.5pt; color: #333; }
-.pw-fill { font-size: 10pt; }
-.pw-title { font-size: 18pt; margin: 12px 0 2px; }
-.pw-sub { margin: 0 0 10px; color: #333; font-size: 10pt; }
+
+/* ── 한 면 ─────────────────────────────────────────────── */
+/* 높이를 고정하거나 flex로 바닥글을 아래에 붙이면 Chrome의 인쇄 분할과 싸운다.
+   (고정 높이는 넘친 글이 다음 면에 겹쳐 찍히고, flex+min-height는 쪽수가 튄다.)
+   평범한 블록 흐름으로 두고 면 구분만 break-after로 준다. */
+.page {
+  font-size: 11pt; line-height: 1.65;
+  word-break: keep-all; overflow-wrap: anywhere;
+  break-after: page;
+}
+.page:last-child { break-after: auto; }
+
+/* 머리띠 */
+.pw-mast { display: flex; justify-content: space-between; align-items: baseline; gap: 6mm;
+  border-bottom: 2.4pt solid #000; padding-bottom: 1.6mm; }
+.pw-mast .nm { font-family: "Jua", sans-serif; font-size: 13.5pt; white-space: nowrap; }
+.pw-mast .meta { font-size: 8.6pt; text-align: right; letter-spacing: -.01em; }
+
+/* 표제부: 왼쪽 제목·부제·기입칸 / 오른쪽 일러스트 */
+.pw-head { display: flex; gap: 6mm; align-items: stretch; margin: 2.5mm 0; }
+.pw-headtxt { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.pw-headtxt .pw-fill { margin-top: auto; }
+.pw-illus { flex: 0 0 32mm; width: 32mm; height: 32mm; object-fit: cover; align-self: flex-end;
+  border: .8pt solid #000; filter: grayscale(1) contrast(1.06) brightness(1.04); }
+.pw-title { font-family: "Jua", sans-serif; font-size: 22pt; line-height: 1.22; margin: 0 0 1.5mm; letter-spacing: -.02em; }
+.pw-sub { margin: 0; font-size: 10.5pt; color: #222; }
+
+/* 이름·학년반·날짜 기입칸 */
+.pw-fill { display: flex; border: 1pt solid #000; margin: 0 0 6mm; }
+.pw-fill > div { flex: 1; border-right: 1pt solid #000; padding: 1.4mm 2.5mm 3mm; }
+.pw-fill > div:last-child { border-right: 0; }
+.pw-fill b { display: block; font-size: 8pt; letter-spacing: .04em; color: #333; }
+.pw-fill .tag { flex: 0 0 26mm; font-size: 8pt; text-align: center; }
+.pw-fill .tag b { font-family: "Jua", sans-serif; font-size: 10pt; color: #000; letter-spacing: 0; }
+
+/* 본문 */
+.pw-body { text-align: justify; }
 .pw-body p { margin: 0 0 .55em; }
-.pw-sec { font-size: 12pt; font-weight: 800; margin: 9px 0 3px; }
-.worksheet hr { border: 0; border-top: 1px dashed #999; margin: 12px 0; }
-.pw-h2 { font-size: 12.5pt; margin: 14px 0 6px; background: #f0f0f0; padding: 3px 8px; border-radius: 4px; }
-.pw-q { margin: 0 0 10px; break-inside: avoid; }
-.pw-qtext { margin: 0 0 4px; }
-.pw-choices { margin: 2px 0 2px 18px; padding: 0; }
-.pw-choices li { margin: 1px 0; }
-.pw-choices li.correct { font-weight: 800; text-decoration: underline; }
-.pw-ox { margin: 2px 0; letter-spacing: 2px; font-weight: 700; }
-.pw-cloze { margin: 2px 0; }
-.pw-lines { height: 46px; border-bottom: 1px solid #bbb; box-shadow: 0 16px 0 -15px #bbb, 0 32px 0 -31px #bbb; }
-.pw-ans { color: #b00; font-size: 10pt; margin: 3px 0 0; }
+.pw-sec { font-family: "Jua", sans-serif; font-size: 13pt; font-weight: 400;
+  margin: 5mm 0 1.8mm; padding-left: 3mm; border-left: 2.4pt solid #000; break-after: avoid; }
+.lv-sprout .pw-body { font-size: 13pt; line-height: 1.95; }
+.lv-sprout .pw-sec { font-size: 14pt; }
+.lv-lower  .pw-body { font-size: 11pt; line-height: 1.62; column-count: 2; column-gap: 8mm; }
+.lv-lower  .pw-sec { font-size: 12.5pt; margin-top: 3.5mm; }
+.lv-upper  .pw-body { font-size: 10.4pt; line-height: 1.40; column-count: 2; column-gap: 8mm; }
+.lv-upper  .pw-sec { font-size: 12pt; margin-top: 2.8mm; }
+
+/* 바닥글 */
+.pw-foot { margin-top: 4mm; padding-top: 2mm; border-top: .6pt solid #000;
+  display: flex; justify-content: space-between; font-size: 8.4pt; color: #333; }
+
+/* ── 문제면 ────────────────────────────────────────────── */
+/* 내용 이해 문항은 신문처럼 2단. 4지선다가 대부분이라 높이가 거의 절반이 된다.
+   짝 잇기는 선 그을 자리가 필요해 단 밖(폭 전체)에 그대로 둔다.
+   1·2학년은 큰 글씨를 지켜야 하므로 1단. */
+.pw-cols { column-count: 2; column-gap: 9mm; column-rule: .4pt solid #bbb; font-size: 10pt; }
+.pw-cols .pw-q { break-inside: avoid; margin-bottom: 4mm; }
+.lv-sprout .pw-cols { column-count: 1; column-rule: none; font-size: inherit; }
+.pw-h2 { font-family: "Jua", sans-serif; font-size: 13.5pt; font-weight: 400;
+  margin: 3.5mm 0 2mm; padding-bottom: 1.2mm; border-bottom: 1.6pt solid #000; break-after: avoid; }
+.pw-h2:first-of-type { margin-top: 1mm; }
+.pw-q { margin: 0 0 3mm; padding-left: 7.5mm; break-inside: avoid; }
+.pw-qtext { margin: 0; position: relative; font-weight: 600; }
+.pw-qtext .num { position: absolute; left: -7.5mm; font-family: "Jua", sans-serif; font-weight: 400; }
+
+.pw-choices { list-style: none; margin: 1.8mm 0 0; padding: 0; }
+.pw-choices li { margin: .6mm 0; padding-left: 6mm; text-indent: -6mm; }
+.pw-choices .mk { display: inline-block; width: 6mm; text-indent: 0; }
+.is-teacher .pw-choices li.is-ans { font-weight: 800; }
+.is-teacher .pw-choices li.is-ans .mk { text-decoration: underline; }
+
+.pw-ox { margin: 2mm 0 0; font-family: "Jua", sans-serif; }
+.pw-ox span { display: inline-block; width: 11mm; height: 8mm; line-height: 8mm; text-align: center;
+  border: .8pt solid #000; font-size: 13pt; margin-right: 3mm; }
+
+.pw-cloze { margin: 2.5mm 0 0; font-size: 9.6pt; color: #333; }
+.pw-cloze .blank { display: inline-block; width: 52mm; height: 5.5mm;
+  border-bottom: 1pt solid #000; vertical-align: -1.5mm; }
+
+.pw-order { list-style: none; margin: 2mm 0 0; padding: 0; }
+.pw-order li { margin: 1mm 0; padding-left: 9mm; text-indent: -9mm; }
+.pw-order .box { display: inline-block; width: 6.5mm; height: 5.5mm; border: .8pt solid #000;
+  margin-right: 2.5mm; text-indent: 0; vertical-align: -1.2mm; }
+
+/* 짝 잇기 — 종이에서는 선 긋기. 가운데 여백이 선을 그을 자리다. */
+.pw-match { display: flex; gap: 20mm; margin: 2.5mm 0 0; }
+.pw-match ol { margin: 0; padding-left: 7mm; }
+.pw-mw { flex: 0 0 40mm; }
+.pw-mm { flex: 1; }
+.pw-match li { margin: 0; min-height: 7.5mm; }
+/* 5·6학년 문제는 문항이 13개라 어차피 두 면이다. 선 긋기 편하게 행을 넉넉히 둔다. */
+.lv-upper .pw-match li { min-height: 8.5mm; }
+.pw-mw { list-style: decimal; font-weight: 700; }
+.pw-mm { list-style: hangul-consonant; }
+
+/* 서술형 답칸 — 배경 그라디언트는 인쇄되지 않으므로 실제 괘선을 그린다. */
+.pw-write { margin: 3mm 0 0; }
+.pw-write .ln { height: 9mm; border-bottom: .8pt solid #888; }
+.lv-upper .pw-write .ln { height: 8mm; }
+
+/* 정답·해설(교사용) — 흑백에서 빨강은 흐린 회색이라 테두리로 구분한다. */
+.pw-ans { margin: 2.5mm 0 0; padding: 1.6mm 2.5mm; border: .8pt solid #000; font-size: 9.2pt; line-height: 1.5; }
+
+/* ── 1·2학년: 글씨는 크게, 대신 문제면을 한 면에 맞춘다 ── */
+.lv-sprout .pw-q { font-size: 11.5pt; line-height: 1.55; margin-bottom: 2mm; }
+.lv-sprout .pw-h2 { margin: 3mm 0 1.8mm; }
+.lv-sprout .pw-choices { margin-top: 1.2mm; }
+.lv-sprout .pw-choices li { margin: .3mm 0; }
+.lv-sprout .pw-match li { min-height: 7mm; }
+.lv-sprout .pw-write .ln { height: 9mm; }
+.lv-sprout .pw-ox span { height: 7mm; line-height: 7mm; }
