@@ -3,20 +3,6 @@ export const SITE_NAME = "마또의 아침신문";
 export const SITE_TAGLINE = "매일 아침, 한 편의 글과 함께";
 export const TIMEZONE_OFFSET_MIN = 9 * 60; // KST(UTC+9)
 
-export const CATEGORY_LABELS = {
-  science: "과학·자연·우주",
-  history: "역사·인물·문화",
-  literature: "문학·고전·신화",
-  language: "우리말·사회상식",
-};
-
-export const CATEGORY_EMOJI = {
-  science: "🔬",
-  history: "🏛️",
-  literature: "📖",
-  language: "🈶",
-};
-
 // 난이도 라벨. sprout(1·2학년)은 기사에 body.sprout이 있을 때만 노출되는 선택 단계.
 export const LEVELS = {
   sprout: { key: "sprout", label: "1·2학년", sub: "1·2학년", tab: "1·2학년" },

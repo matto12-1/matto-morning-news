@@ -1,5 +1,5 @@
 // assets/render.js — 어린이 잡지 시안 결의 홈/기사 렌더.
-import { SITE_NAME, CATEGORY_LABELS, LEVELS, LEVEL_ORDER } from "./config.js";
+import { SITE_NAME, LEVELS, LEVEL_ORDER } from "./config.js";
 import { SPECKLE } from "./art.js";
 
 const escapeHtml = (s) =>
@@ -131,6 +131,7 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
 }
 
 // 지난 호 아카이브 화면. today: 오늘까지 발행된 호만 보여준다(미래 호 숨김).
+// 갈래 라벨은 여기 하나뿐이다. 갈래를 늘리면 topics.json과 이 표를 같이 고칠 것.
 const CAT_SHORT = { science: "과학", history: "역사", literature: "문학", language: "우리말", tech: "기술", society: "사회", art: "예술", mind: "마음" };
 export function renderArchive(manifest, today, { onOpen, onClose } = {}) {
   const el = document.createElement("article");
