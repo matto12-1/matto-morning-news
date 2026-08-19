@@ -3,6 +3,7 @@ import { loadIndex, loadArticle, loadManifest, pickIssueDate, todayISO } from ".
 import { renderHome, renderArchive, renderStory, mountVocabTooltips } from "./render.js";
 import { renderQuiz } from "./quiz.js";
 import { openPrintDialog } from "./print.js";
+import { mountViews } from "./views.js";
 import { SPECKLE } from "./art.js";
 import * as tts from "./tts.js";
 
@@ -97,6 +98,7 @@ function render() {
     },
   });
   app.appendChild(home);
+  mountViews(home);
   wireTts(home);
   wireFontToggle(home);
   focusMain(".hook");

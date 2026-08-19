@@ -1,0 +1,47 @@
+// assets/views.js — 조회수. 탭(세션) 하나당 한 번만 센다.
+// 조회수를 못 가져와도 신문은 그대로 떠야 한다. 실패는 전부 조용히 삼킨다.
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js";
+
+const MARK = "mn-counted";
+
+// sessionStorage는 사파리 사생활 보호 모드 등에서 던질 수 있다.
+// 읽기가 실패하면 '아직 안 셈'으로 보고 넘어간다(최악이라도 숫자가 조금 부풀 뿐).
+const marked = (store) => { try { return !!store?.getItem(MARK); } catch { return false; } };
+const mark = (store) => { try { store?.setItem(MARK, "1"); } catch { /* 무시 */ } };
+
+// 이 탭이 이미 셌으면 읽기만, 아니면 +1. 순수 함수라 테스트로 잡는다.
+export const pickRpc = (store) => (marked(store) ? "mn_get_views" : "mn_bump_view");
+
+export const formatCount = (n) => Number(n || 0).toLocaleString("ko-KR");
+
+export async function fetchViews(store = globalThis.sessionStorage) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${pickRpc(store)}`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: "{}",
+  });
+  if (!res.ok) throw new Error(`조회수 조회 실패 (${res.status})`);
+  const [row] = await res.json();
+  mark(store);
+  return { today: Number(row?.today ?? 0), total: Number(row?.total ?? 0) };
+}
+
+// 한 번 부른 결과를 재사용한다. 학년 토글처럼 화면을 다시 그릴 때마다
+// 네트워크를 다시 타지 않게(그리고 두 번 세지 않게) 하기 위함.
+let pending;
+
+export function mountViews(root) {
+  const el = root.querySelector(".views");
+  if (!el) return;
+  pending ??= fetchViews();
+  pending
+    .then(({ today, total }) => {
+      el.textContent = `👀 오늘 ${formatCount(today)} · 누적 ${formatCount(total)}`;
+      el.hidden = false;
+    })
+    .catch(() => { /* 조회수는 못 보여도 신문은 뜬다 */ });
+}

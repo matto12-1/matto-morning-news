@@ -118,6 +118,7 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
     </div>
 
     <div class="cta"><button type="button" class="btn primary big" id="start-quiz">오늘의 문제 풀기 →</button></div>
+    <p class="views" hidden></p>
   `;
 
   mountVocabTooltips(el, article.vocab);

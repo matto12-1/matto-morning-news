@@ -321,3 +321,6 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 @media (max-width:480px){ .paper{ padding:14px 15px 50px; } .story,.quiz{ padding:8px 16px 22px; } }
 @media (prefers-reduced-motion:reduce){ *{ animation:none!important; scroll-behavior:auto!important; transition:none!important; } }
 #print-root{ display:none; }
+
+/* 조회수 — 홈 맨 아래 구석에 작게. 못 가져오면 hidden 그대로다. */
+.views{ margin:14px 4px 0; text-align:right; font-size:.76rem; font-weight:700; color:var(--ink-3); letter-spacing:-.01em; }
