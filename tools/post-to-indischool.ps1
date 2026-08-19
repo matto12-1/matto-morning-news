@@ -36,7 +36,7 @@ if ($Install) {
     Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger `
       -Settings $settings -Force | Out-Null
     "등록 완료: 평일 $At. 그때 PC가 꺼져 있었으면 켜는 즉시 실행됩니다."
-    "  해제하려면  .\post-to-indischool.ps1 -Uninstall"
+    "  해제하려면  & '$PSCommandPath' -Uninstall"
   } catch {
     "등록 실패: $($_.Exception.Message)"
     "PowerShell을 '관리자 권한으로 실행'한 뒤 다시 시도해보세요."
