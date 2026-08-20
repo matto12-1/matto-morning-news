@@ -40,7 +40,11 @@ export function mountViews(root) {
   pending ??= fetchViews();
   pending
     .then(({ today, total }) => {
-      el.textContent = `👀 오늘 ${formatCount(today)} · 누적 ${formatCount(total)}`;
+      // 숫자만 형광펜(--hi)으로 칠한다. 본문 낱말(.vocab)과 같은 문법.
+      // formatCount는 Number를 통과시킨 문자열이라 innerHTML에 넣어도 안전하다.
+      el.innerHTML =
+        `오늘 <span class="n">${formatCount(today)}</span>명이 읽었어요` +
+        ` · 지금까지 <span class="n">${formatCount(total)}</span>명`;
       el.hidden = false;
     })
     .catch(() => { /* 조회수는 못 보여도 신문은 뜬다 */ });
