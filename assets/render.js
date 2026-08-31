@@ -119,10 +119,9 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
 
     <div class="cta"><button type="button" class="btn primary big" id="start-quiz">오늘의 문제 풀기 →</button></div>
     <p class="views" hidden></p>
-    <footer class="sibfoot">
-      <span class="lb">마또가 만든 다른 것</span>
-      <a href="${SIBLING.url}" target="_blank" rel="noopener">${escapeHtml(SIBLING.name)} 보러 가기</a>
-      <span class="bl">${escapeHtml(SIBLING.blurb)}</span>
+    <footer class="lab">
+      <span class="labmark"><i>Matto</i><b>LAB</b></span>
+      <span class="labrow"><span class="here">${escapeHtml(SITE_NAME)}</span><span class="dot">·</span><a href="${SIBLING.url}" target="_blank" rel="noopener">${escapeHtml(SIBLING.name)}</a></span>
     </footer>
   `;
 
@@ -171,10 +170,9 @@ export function renderArchive(manifest, today, { onOpen, onClose } = {}) {
         ? `<div class="arch-grid">${items.map(card).join("")}</div>`
         : `<p class="arch-empty">아직 지난 호가 없어요.<br>내일부터 새 신문이 하루에 하나씩 쌓여요! 📚</p>`}
     </div>
-    <footer class="sibfoot">
-      <span class="lb">마또가 만든 다른 것</span>
-      <a href="${SIBLING.url}" target="_blank" rel="noopener">${escapeHtml(SIBLING.name)} 보러 가기</a>
-      <span class="bl">${escapeHtml(SIBLING.blurb)}</span>
+    <footer class="lab">
+      <span class="labmark"><i>Matto</i><b>LAB</b></span>
+      <span class="labrow"><span class="here">${escapeHtml(SITE_NAME)}</span><span class="dot">·</span><a href="${SIBLING.url}" target="_blank" rel="noopener">${escapeHtml(SIBLING.name)}</a></span>
     </footer>`;
   el.querySelector("#arch-close").addEventListener("click", () => onClose?.());
   el.querySelectorAll(".arch-card").forEach((b) => b.addEventListener("click", () => onOpen?.(b.dataset.date)));

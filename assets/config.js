@@ -4,7 +4,7 @@ export const SITE_TAGLINE = "매일 아침, 한 편의 글과 함께";
 
 // 같은 사람이 만든 이웃 사이트. 두 사이트가 서로를 가리켜 한 브랜드임을 밝힌다.
 // 저쪽 저장소는 matto12-1/matto-daily-classics 이고, 그쪽 푸터에도 같은 짝 링크가 있다.
-export const SIBLING = { name: "매일 읽는 고전", url: "https://matto-daily-classics.vercel.app/", blurb: "초등 5·6학년, 평일마다 고전 한 편" };
+export const SIBLING = { name: "매일 읽는 고전", url: "https://matto-daily-classics.vercel.app/" };
 export const TIMEZONE_OFFSET_MIN = 9 * 60; // KST(UTC+9)
 
 // 난이도 라벨. sprout(1·2학년)은 기사에 body.sprout이 있을 때만 노출되는 선택 단계.
