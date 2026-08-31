@@ -325,6 +325,15 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 /* 조회수 — 홈 맨 아래 구석에 작게. 못 가져오면 hidden 그대로다.
    숫자에 칠하는 형광펜은 본문 낱말(.vocab)과 같은 값을 쓴다. --hi는 갈래마다
    달라서 형광펜 색도 그날 기사를 따라간다. */
+/* 이웃 사이트로 건너가는 줄. 같은 브랜드임을 밝히는 자리라 눈에 띄되 본문을 밀지 않는다. */
+.sibfoot{ margin:26px 4px 0; padding-top:14px; border-top:1px solid rgba(0,0,0,.10);
+  display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline;
+  font-size:.84rem; color:var(--ink-3); }
+.sibfoot .lb{ font-weight:700; }
+.sibfoot a{ font-weight:800; color:var(--accent-dark); text-decoration:none;
+  border-bottom:2px solid var(--hi); padding-bottom:1px; }
+.sibfoot a:hover{ color:var(--ink); border-bottom-color:var(--accent); }
+.sibfoot .bl{ color:var(--ink-3); }
 .views{ margin:16px 4px 0; text-align:right; font-size:.82rem; font-weight:700; color:var(--ink-3); }
 .views .n{ font-weight:800; color:var(--body); padding:0 2px; font-variant-numeric:tabular-nums;
   box-shadow:inset 0 -.36em 0 var(--hi); border-radius:2px; }
