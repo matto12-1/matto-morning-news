@@ -42,6 +42,6 @@ export const labFooter = ({ withViews = true } = {}) => `<footer class="lab">
           ${row("Indischool", CONTACT.indischool, null)}
           ${row("Website", CONTACT.website, CONTACT.website)}
         </div>
+        ${withViews ? `<p class="views" hidden></p>` : ""}
       </div>
-      <div class="lab-tail">${withViews ? `<p class="views" hidden></p>` : ""}</div>
     </footer>`;
