@@ -361,8 +361,10 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
   letter-spacing:.06em; color:#8A857A; white-space:nowrap; }
 .cx .k.v2{ padding-left:17px; border-left:1px solid rgba(0,0,0,.12); }
 .cx .dash{ color:rgba(0,0,0,.20); }
-.cx a{ color:var(--ink-3); text-decoration:none;
-  border-bottom:1px solid rgba(0,0,0,.16); padding-bottom:1px; }
+/* 연락처는 밑줄 없이 둔다. 네 줄이 나란히 서면 밑줄이 줄무늬처럼 보인다.
+   가리켰을 때만 밑줄이 떠서 누를 수 있음을 알린다. */
+.cx a{ color:var(--ink-3); text-decoration:none; border-bottom:1px solid transparent;
+  padding-bottom:1px; }
 .cx a:hover{ color:var(--ink); border-bottom-color:rgba(0,0,0,.38); }
 .cx .soon{ color:#A9A396; }
 
