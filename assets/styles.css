@@ -329,49 +329,49 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
    워드마크는 브랜드 문서 규칙 그대로: Sora · Matto=Medium/Ink · LAB=ExtraBold/Signal Coral.
    코랄은 LAB에만 쓴다(그래서 여기서만 갈래 색 --accent를 쓰지 않는다).
    18px = 워드마크 가로 90px, 브랜드 문서의 최소 크기다. */
+/* MattoLAB 푸터. 확정안과 이유는 매일 읽는 고전 저장소의 docs/mattolab-footer.md (시안 A-2).
+   왼쪽에 브랜드와 제품 격자, 오른쪽에 Contact 한 열, 맨 아래 가는 줄에 조회수. */
 .lab{ position:relative; z-index:6; margin:28px 4px 0; padding-top:14px;
   border-top:1px solid rgba(0,0,0,.10);
-  display:flex; flex-wrap:wrap; gap:8px 22px; align-items:flex-end; justify-content:space-between; }
-.lab-l{ display:flex; flex-direction:column; gap:7px; min-width:0; }
-.lab-top{ display:flex; flex-wrap:wrap; gap:6px 18px; align-items:baseline; }
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(190px,auto);
+  gap:16px 40px; align-items:start; }
+.lab-tail{ grid-column:1/-1; display:flex; justify-content:flex-end;
+  border-top:1px solid rgba(0,0,0,.08); padding-top:9px; margin-top:2px; min-height:1px; }
+
+.brandline{ display:flex; align-items:baseline; gap:15px; margin-bottom:12px; flex-wrap:wrap; }
 .labmark{ font-family:"Sora", var(--sans); font-size:18px; letter-spacing:-.012em; line-height:1; }
 .labmark i{ font-style:normal; font-weight:500; color:#1E1E1E; }
 .labmark b{ font-weight:800; color:#E8590C; }
-.labrow{ display:flex; flex-wrap:wrap; gap:4px 9px; align-items:baseline;
-  font-size:.8rem; color:var(--ink-3); }
-.labrow .here{ color:var(--body); font-weight:700; }
-.labrow .dot{ color:rgba(0,0,0,.20); }
-.labrow a{ color:var(--ink-3); text-decoration:none;
-  border-bottom:1px solid rgba(0,0,0,.16); padding-bottom:1px; }
-/* 코랄은 LAB에만 쓴다(브랜드 문서 Don't). hover는 이 사이트의 잉크로 짙어진다. */
-.labrow a:hover{ color:var(--ink); border-bottom-color:rgba(0,0,0,.38); }
+.brandline em{ font-style:normal; font-size:11.5px; color:#948C7B; }
 
-/* Contact 칸: 굵은 세로선이 "이 네 줄은 한 덩어리"임을 말하고,
-   안쪽 가는 선이 두 열을 가른다. 값 길이가 제각각이라(이메일은 길고 핸들은 짧다)
-   선이 없으면 오른쪽 열 시작점이 눈에 안 잡혀 한 줄로 이어져 읽힌다.
-   매일 읽는 고전 푸터와 같은 모양이다. */
-.cxwrap{ display:flex; gap:11px; align-items:stretch; }
-.cxbar{ width:2px; background:rgba(0,0,0,.14); flex:none; border-radius:1px; }
+/* 제품 격자: 2행을 유지한 채 오른쪽으로 자란다. 열 너비는 내용에 맞춘다. */
+.prod{ display:grid; grid-auto-flow:column; grid-template-rows:repeat(2,auto);
+  justify-content:start; gap:9px 18px; }
+.p{ display:flex; flex-direction:column; gap:1px; min-width:0; }
+.p b{ font-weight:600; font-size:12.5px; color:var(--body); white-space:nowrap; }
+.p b.on{ color:#E8590C; }   /* 지금 보고 있는 제품 */
+.p em{ font-style:normal; color:#948C7B; font-size:11px; white-space:nowrap; }
+.p a{ color:var(--body); text-decoration:none; border-bottom:1px solid transparent; }
+.p a:hover{ color:var(--ink); border-bottom-color:rgba(0,0,0,.38); }
+
 .lab-label{ font-family:"Sora", var(--sans); font-weight:700; font-size:10.5px;
   letter-spacing:.14em; text-transform:uppercase; color:var(--accent-dark);
-  margin-bottom:4px; }
-.cx{ display:grid; grid-template-columns:auto auto minmax(0,1fr) auto auto minmax(0,1fr);
+  display:block; margin-bottom:7px; }
+.cx{ display:grid; grid-template-columns:auto auto minmax(0,1fr);
   gap:3px 9px; align-items:baseline; font-size:.76rem; color:var(--ink-3); }
 .cx .k{ font-family:"Sora", var(--sans); font-weight:600; font-size:10.5px;
   letter-spacing:.06em; color:#8A857A; white-space:nowrap; }
-.cx .k.v2{ padding-left:17px; border-left:1px solid rgba(0,0,0,.12); }
 .cx .dash{ color:rgba(0,0,0,.20); }
-/* 연락처는 밑줄 없이 둔다. 네 줄이 나란히 서면 밑줄이 줄무늬처럼 보인다.
-   가리켰을 때만 밑줄이 떠서 누를 수 있음을 알린다. */
+/* 연락처는 밑줄 없이 둔다. 네 줄이 나란히 서면 밑줄이 줄무늬처럼 보인다. */
 .cx a{ color:var(--ink-3); text-decoration:none; border-bottom:1px solid transparent;
   padding-bottom:1px; }
 .cx a:hover{ color:var(--ink); border-bottom-color:rgba(0,0,0,.38); }
 .cx .soon{ color:#A9A396; }
 
-@media (max-width:700px){
-  /* 좁으면 2열이 붙어 읽힌다. 한 열로 세운다. */
-  .cx{ grid-template-columns:auto auto minmax(0,1fr); }
-  .cx .k.v2{ padding-left:0; border-left:0; }
+@media (max-width:760px){
+  .lab{ grid-template-columns:1fr; gap:14px; }
+  .prod{ grid-auto-flow:row; grid-template-rows:none; gap:9px 0; }
+}
 }
 .views{ margin:0; text-align:right; font-size:.82rem; font-weight:700; color:var(--ink-3);
   white-space:nowrap; }
