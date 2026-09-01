@@ -2,21 +2,8 @@
 export const SITE_NAME = "마또의 아침신문";
 export const SITE_TAGLINE = "매일 아침, 한 편의 글과 함께";
 
-// MattoLAB이 만든 것들. 푸터 격자가 이 목록을 그대로 그린다.
-// **두 사이트가 같은 목록을 들고 있어야 한다.** 새 제품이 생기면 양쪽 config.js에 넣는다.
-// 지금 보고 있는 사이트는 name === SITE_NAME으로 알아내 코랄로 표시하고 링크를 걸지 않는다.
-export const PRODUCTS = [
-  { name: "매일 읽는 고전", desc: "초등 5·6학년 · 평일 연재", url: "https://matto-daily-classics.vercel.app/" },
-  { name: "마또의 아침신문", desc: "초등 1~6학년 · 평일 연재", url: "https://matto12-1.github.io/matto-morning-news/" },
-];
-export const LAB_TAGLINE = "선생님이 만드는 교실 도구";
-
-export const CONTACT = {
-  email: "wodb0410@gmail.com",
-  instagram: "Matto__lab",
-  indischool: "Matto",   // 링크 없이 이름만 (인디스쿨은 로그인해야 보이는 데가 많다)
-  website: null,
-};
+// 제품 목록·연락처·태그라인은 공용 저장소로 갔다: assets/brand/products.js
+// (원본은 f:/VibeCoding/mattolab-brand/products.js)
 export const TIMEZONE_OFFSET_MIN = 9 * 60; // KST(UTC+9)
 
 // 난이도 라벨. sprout(1·2학년)은 기사에 body.sprout이 있을 때만 노출되는 선택 단계.
