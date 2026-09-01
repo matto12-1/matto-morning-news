@@ -1,5 +1,6 @@
 // assets/render.js — 어린이 잡지 시안 결의 홈/기사 렌더.
-import { SITE_NAME, LEVELS, LEVEL_ORDER, SIBLING, CONTACT } from "./config.js";
+import { SITE_NAME, LEVELS, LEVEL_ORDER } from "./config.js";
+import { labFooter } from "./brand.js";
 import { SPECKLE } from "./art.js";
 
 const escapeHtml = (s) =>
@@ -118,18 +119,7 @@ export function renderHome(article, { level = "lower", handlers = {} } = {}) {
     </div>
 
     <div class="cta"><button type="button" class="btn primary big" id="start-quiz">오늘의 문제 풀기 →</button></div>
-    <footer class="lab">
-      <div class="lab-l">
-        <span class="lab-top">
-          <span class="labmark"><i>Matto</i><b>LAB</b></span>
-          <span class="labrow"><span class="here">${escapeHtml(SITE_NAME)}</span><span class="dot">·</span><a href="${SIBLING.url}" target="_blank" rel="noopener">${escapeHtml(SIBLING.name)}</a></span>
-        </span>
-        <span class="labcontact">
-          <a href="mailto:${CONTACT.email}">${escapeHtml(CONTACT.email)}</a><span class="dot">·</span><a href="https://instagram.com/${CONTACT.instagram}" target="_blank" rel="noopener">Instagram @${escapeHtml(CONTACT.instagram)}</a>
-        </span>
-      </div>
-      <p class="views" hidden></p>
-    </footer>
+    ${labFooter()}
   `;
 
   mountVocabTooltips(el, article.vocab);
@@ -177,17 +167,7 @@ export function renderArchive(manifest, today, { onOpen, onClose } = {}) {
         ? `<div class="arch-grid">${items.map(card).join("")}</div>`
         : `<p class="arch-empty">아직 지난 호가 없어요.<br>내일부터 새 신문이 하루에 하나씩 쌓여요! 📚</p>`}
     </div>
-    <footer class="lab">
-      <div class="lab-l">
-        <span class="lab-top">
-          <span class="labmark"><i>Matto</i><b>LAB</b></span>
-          <span class="labrow"><span class="here">${escapeHtml(SITE_NAME)}</span><span class="dot">·</span><a href="${SIBLING.url}" target="_blank" rel="noopener">${escapeHtml(SIBLING.name)}</a></span>
-        </span>
-        <span class="labcontact">
-          <a href="mailto:${CONTACT.email}">${escapeHtml(CONTACT.email)}</a><span class="dot">·</span><a href="https://instagram.com/${CONTACT.instagram}" target="_blank" rel="noopener">Instagram @${escapeHtml(CONTACT.instagram)}</a>
-        </span>
-      </div>
-    </footer>`;
+    ${labFooter({ withViews: false })}`;
   el.querySelector("#arch-close").addEventListener("click", () => onClose?.());
   el.querySelectorAll(".arch-card").forEach((b) => b.addEventListener("click", () => onOpen?.(b.dataset.date)));
   el.querySelectorAll(".arch-chip").forEach((chip) => chip.addEventListener("click", () => {

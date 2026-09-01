@@ -337,15 +337,40 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .labmark{ font-family:"Sora", var(--sans); font-size:18px; letter-spacing:-.012em; line-height:1; }
 .labmark i{ font-style:normal; font-weight:500; color:#1E1E1E; }
 .labmark b{ font-weight:800; color:#E8590C; }
-.labrow, .labcontact{ display:flex; flex-wrap:wrap; gap:4px 9px; align-items:baseline;
+.labrow{ display:flex; flex-wrap:wrap; gap:4px 9px; align-items:baseline;
   font-size:.8rem; color:var(--ink-3); }
-.labcontact{ font-size:.76rem; }
 .labrow .here{ color:var(--body); font-weight:700; }
-.labrow .dot, .labcontact .dot{ color:rgba(0,0,0,.20); }
-.labrow a, .labcontact a{ color:var(--ink-3); text-decoration:none;
+.labrow .dot{ color:rgba(0,0,0,.20); }
+.labrow a{ color:var(--ink-3); text-decoration:none;
   border-bottom:1px solid rgba(0,0,0,.16); padding-bottom:1px; }
 /* 코랄은 LAB에만 쓴다(브랜드 문서 Don't). hover는 이 사이트의 잉크로 짙어진다. */
-.labrow a:hover, .labcontact a:hover{ color:var(--ink); border-bottom-color:rgba(0,0,0,.38); }
+.labrow a:hover{ color:var(--ink); border-bottom-color:rgba(0,0,0,.38); }
+
+/* Contact 칸: 굵은 세로선이 "이 네 줄은 한 덩어리"임을 말하고,
+   안쪽 가는 선이 두 열을 가른다. 값 길이가 제각각이라(이메일은 길고 핸들은 짧다)
+   선이 없으면 오른쪽 열 시작점이 눈에 안 잡혀 한 줄로 이어져 읽힌다.
+   매일 읽는 고전 푸터와 같은 모양이다. */
+.cxwrap{ display:flex; gap:11px; align-items:stretch; }
+.cxbar{ width:2px; background:rgba(0,0,0,.14); flex:none; border-radius:1px; }
+.lab-label{ font-family:"Sora", var(--sans); font-weight:700; font-size:10.5px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--accent-dark);
+  margin-bottom:4px; }
+.cx{ display:grid; grid-template-columns:auto auto minmax(0,1fr) auto auto minmax(0,1fr);
+  gap:3px 9px; align-items:baseline; font-size:.76rem; color:var(--ink-3); }
+.cx .k{ font-family:"Sora", var(--sans); font-weight:600; font-size:10.5px;
+  letter-spacing:.06em; color:#8A857A; white-space:nowrap; }
+.cx .k.v2{ padding-left:17px; border-left:1px solid rgba(0,0,0,.12); }
+.cx .dash{ color:rgba(0,0,0,.20); }
+.cx a{ color:var(--ink-3); text-decoration:none;
+  border-bottom:1px solid rgba(0,0,0,.16); padding-bottom:1px; }
+.cx a:hover{ color:var(--ink); border-bottom-color:rgba(0,0,0,.38); }
+.cx .soon{ color:#A9A396; }
+
+@media (max-width:700px){
+  /* 좁으면 2열이 붙어 읽힌다. 한 열로 세운다. */
+  .cx{ grid-template-columns:auto auto minmax(0,1fr); }
+  .cx .k.v2{ padding-left:0; border-left:0; }
+}
 .views{ margin:0; text-align:right; font-size:.82rem; font-weight:700; color:var(--ink-3);
   white-space:nowrap; }
 .views .n{ font-weight:800; color:var(--body); padding:0 2px; font-variant-numeric:tabular-nums;
