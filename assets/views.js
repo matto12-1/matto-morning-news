@@ -7,6 +7,8 @@ const MARK = "mn-counted";
 // sessionStorage는 사파리 사생활 보호 모드 등에서 던질 수 있다.
 // 읽기가 실패하면 '아직 안 셈'으로 보고 넘어간다(최악이라도 숫자가 조금 부풀 뿐).
 const marked = (store) => { try { return !!store?.getItem(MARK); } catch { return false; } };
+// 접근 자체가 던지는 브라우저가 있다. 못 쓰면 없는 셈 친다.
+const safeStore = (s) => { try { return s ?? globalThis.sessionStorage; } catch { return null; } };
 const mark = (store) => { try { store?.setItem(MARK, "1"); } catch { /* 무시 */ } };
 
 // 이 탭이 이미 셌으면 읽기만, 아니면 +1. 순수 함수라 테스트로 잡는다.
@@ -14,7 +16,10 @@ export const pickRpc = (store) => (marked(store) ? "mn_get_views" : "mn_bump_vie
 
 export const formatCount = (n) => Number(n || 0).toLocaleString("ko-KR");
 
-export async function fetchViews(store = globalThis.sessionStorage) {
+// 기본 인자로 sessionStorage를 집으면 전면 차단 브라우저에서 여기서 바로 던진다
+// (mountViews는 render()에서 try 없이 불린다 → 신문이 통째로 안 뜬다).
+export async function fetchViews(storage) {
+  const store = safeStore(storage);
   const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${pickRpc(store)}`, {
     method: "POST",
     headers: {

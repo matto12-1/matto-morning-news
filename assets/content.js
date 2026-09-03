@@ -37,13 +37,18 @@ export async function loadManifest() {
 // localStorage는 사파리 사생활 보호 모드 등에서 던진다 — 실패하면 기본 학년으로 뜬다.
 const LEVEL_KEY = "mn-level";
 
-export function readLevel(store = globalThis.localStorage, fallback = "lower") {
+// store를 기본 인자로 두면 안 된다: 쿠키·사이트 데이터를 전면 차단한 브라우저는
+// localStorage에 '접근하는 것만으로' 던지는데, 기본 인자는 try 바깥에서 평가된다.
+// 그러면 이 모듈이 통째로 죽어 신문이 아예 안 뜬다. 반드시 try 안에서 집는다.
+export function readLevel(store, fallback = "lower") {
   try {
-    const v = store?.getItem(LEVEL_KEY);
+    const v = (store ?? globalThis.localStorage)?.getItem(LEVEL_KEY);
     return LEVEL_ORDER.includes(v) ? v : fallback;   // 낯선 값이 들어있으면 무시
   } catch { return fallback; }
 }
 
-export function saveLevel(level, store = globalThis.localStorage) {
-  try { if (LEVEL_ORDER.includes(level)) store?.setItem(LEVEL_KEY, level); } catch { /* 무시 */ }
+export function saveLevel(level, store) {
+  try {
+    if (LEVEL_ORDER.includes(level)) (store ?? globalThis.localStorage)?.setItem(LEVEL_KEY, level);
+  } catch { /* 기억은 못 해도 신문은 뜬다 */ }
 }

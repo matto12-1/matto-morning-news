@@ -59,3 +59,19 @@ test("저장소를 못 쓰는 브라우저에서도 터지지 않는다", () => 
   assert.doesNotThrow(() => saveLevel("upper", fakeStore(null, { throws: true })));
   assert.doesNotThrow(() => saveLevel("upper", undefined));
 });
+
+test("localStorage 접근 자체가 막힌 브라우저에서도 신문은 뜬다", () => {
+  // 쿠키·사이트 데이터 전면 차단: window.localStorage를 읽는 것만으로 던진다.
+  const orig = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    get() { const e = new Error("blocked"); e.name = "SecurityError"; throw e; },
+  });
+  try {
+    assert.equal(readLevel(), "lower");                 // 던지지 않고 기본 학년
+    assert.doesNotThrow(() => saveLevel("upper"));      // 저장 실패는 조용히
+  } finally {
+    if (orig) Object.defineProperty(globalThis, "localStorage", orig);
+    else delete globalThis.localStorage;
+  }
+});
