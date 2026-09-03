@@ -100,8 +100,16 @@ export function renderQuiz(article, { level = "lower", onBack, recommend = [], o
     root.querySelector(".qp-label").textContent = `푼 문제 ${answered} / ${total}`;
   };
 
+  // 앞 문제 아래쪽에 멈춰 있던 스크롤이 그대로 남아, 새로 뜬 것(문제 카드·'확인'·'다음 문제')이
+  // 화면 밖에 걸리는 일을 막는다. 화면 안에 이미 다 보이면 스크롤하지 않는다.
+  const ensureVisible = (el, block) => {
+    const r = el.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > window.innerHeight) el.scrollIntoView({ block, behavior: "smooth" });
+  };
+
   const swap = (node) => {
     flow.replaceChildren(node);
+    ensureVisible(flow, "start");
     node.animate?.(
       [{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }],
       { duration: 220, easing: "ease-out" }
@@ -148,6 +156,7 @@ export function renderQuiz(article, { level = "lower", onBack, recommend = [], o
       next.addEventListener("click", () => showQuestion(i + 1));
       nav.appendChild(next);
       next.focus({ preventScroll: true });
+      ensureVisible(nav, "end");
     };
 
     renderInput(card, item, i, answers, settle);
@@ -169,7 +178,7 @@ export function renderQuiz(article, { level = "lower", onBack, recommend = [], o
     const MIN = 5; // 최소 성의: 빈칸·장난 답이 그냥 넘어가지 않게(채점은 안 함)
     const hint = document.createElement("p");
     hint.className = "think-hint";
-    hint.textContent = "내 생각을 한 문장 써 보면 결과를 볼 수 있어요.";
+    hint.textContent = `내 생각을 ${MIN}글자 이상 쓰면 결과를 볼 수 있어요.`;
 
     // 다 쓰면 열리는 '예시답안 + 자기점검' 묶음
     const reveal = document.createElement("div");

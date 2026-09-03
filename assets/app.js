@@ -1,5 +1,5 @@
 // assets/app.js — 진입점: 부팅·라우팅·상태·에러 폴백.
-import { loadIndex, loadArticle, loadManifest, pickIssueDate, todayISO } from "./content.js";
+import { loadIndex, loadArticle, loadManifest, pickIssueDate, todayISO, readLevel, saveLevel } from "./content.js";
 import { renderHome, renderArchive, renderStory, mountVocabTooltips } from "./render.js";
 import { renderQuiz } from "./quiz.js";
 import { openPrintDialog } from "./print.js";
@@ -9,7 +9,7 @@ import * as tts from "./tts.js";
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const app = document.getElementById("app");
-const state = { article: null, level: "lower", view: "home" };
+const state = { article: null, level: readLevel(), view: "home" };
 
 boot();
 
@@ -33,8 +33,9 @@ async function boot() {
 function render() {
   tts.stop();
   app.innerHTML = "";
-  // 현재 기사에 없는 학년 단계(예: 1·2학년 미제작 호)면 저학년으로 폴백.
-  if (state.article?.body && !state.article.body[state.level]) state.level = "lower";
+  // 이 호에 없는 학년 단계(예: 1·2학년 미제작 호)면 이번 화면만 3·4학년으로 폴백한다.
+  // 사용자가 고른 state.level 자체는 건드리지 않는다 — 다음 호에서 되살아나야 하므로.
+  const level = state.article?.body?.[state.level] ? state.level : "lower";
   if (state.view === "archive") {
     const arch = renderArchive(state.manifest || [], todayISO(), {
       onOpen: (date) => openIssue(date),
@@ -57,12 +58,12 @@ function render() {
     readPane.className = "read-pane";
     readPane.innerHTML =
       `<p class="read-h">📖 오늘의 기사 · ${esc(state.article.title)}</p>` +
-      `<div class="read-body">${renderStory(state.article.body[state.level], state.article.vocab)}</div>`;
+      `<div class="read-body">${renderStory(state.article.body[level], state.article.vocab)}</div>`;
     mountVocabTooltips(readPane, state.article.vocab);
     enableDragScroll(readPane);
 
     const quizEl = renderQuiz(state.article, {
-      level: state.level,
+      level,
       recommend: pickRecommendations(state.manifest || [], state.article),
       onOpenIssue: (date) => openIssue(date),
       onBack: (why) => {
@@ -81,9 +82,9 @@ function render() {
   }
 
   const home = renderHome(state.article, {
-    level: state.level,
+    level,
     handlers: {
-      onLevelChange: (lvl) => { state.level = lvl; render(); },
+      onLevelChange: (lvl) => { state.level = lvl; saveLevel(lvl); render(); },
       onStartQuiz: async () => {
         // 결과 화면의 '다음 기사 추천'에 쓸 지난 호 목록을 미리 확보(실패해도 퀴즈는 진행).
         if (!state.manifest) { try { state.manifest = await loadManifest(); } catch { state.manifest = []; } }
@@ -92,7 +93,7 @@ function render() {
       onPrint: async () => {
         // '여러 호 함께 인쇄'에 쓸 지난 호 목록(실패해도 이번 호 인쇄는 된다).
         if (!state.manifest) { try { state.manifest = await loadManifest(); } catch { state.manifest = []; } }
-        openPrintDialog(state.article, state.level, { manifest: state.manifest, today: todayISO(), loadArticle });
+        openPrintDialog(state.article, level, { manifest: state.manifest, today: todayISO(), loadArticle });
       },
       onArchive: () => openArchive(),
     },
@@ -184,7 +185,6 @@ async function openArchive() {
 async function openIssue(date) {
   try {
     state.article = await loadArticle(date);
-    state.level = "lower";
     state.view = "home";
     render();
   } catch (err) { renderError(err); }

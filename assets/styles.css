@@ -120,10 +120,12 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .btn.primary{ background:var(--accent); color:#fff; border-width:3px;
   box-shadow:0 6px 0 var(--accent-dark), 0 14px 20px -6px rgba(0,0,0,.28), inset 0 2px 0 rgba(255,255,255,.32);
   transition:transform .08s ease, box-shadow .08s ease; }
-.btn.primary:hover{ transform:translateY(-1px); box-shadow:0 7px 0 var(--accent-dark), 0 16px 22px -6px rgba(0,0,0,.28), inset 0 2px 0 rgba(255,255,255,.32); }
-.btn.primary:active{ transform:translateY(5px); box-shadow:0 1px 0 var(--accent-dark), 0 4px 8px -4px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.2); }
+.btn.primary:hover:not(:disabled){ transform:translateY(-1px); box-shadow:0 7px 0 var(--accent-dark), 0 16px 22px -6px rgba(0,0,0,.28), inset 0 2px 0 rgba(255,255,255,.32); }
+.btn.primary:active:not(:disabled){ transform:translateY(5px); box-shadow:0 1px 0 var(--accent-dark), 0 4px 8px -4px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.2); }
 .btn.big{ font-size:1.25rem; padding:15px 34px; }
 .btn.small{ padding:8px 16px; min-height:40px; font-size:.95rem; }
+/* 아직 누를 수 없는 버튼은 눌러도 아무 일이 없다 - 그게 보여야 한다 */
+.btn:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; transform:none; }
 .btn:focus-visible,.lvl:focus-visible,.choice:focus-visible,.tbtn:focus-visible{ outline:3px solid var(--accent2); outline-offset:2px; }
 .headline:focus,.hook:focus,.quiz-title:focus{ outline:none; }
 .cta{ position:relative; z-index:6; text-align:center; padding:30px 0 4px; }
@@ -189,14 +191,14 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
 .quiz-footer{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; padding:18px 0 4px; }
 
 /* 한 문제씩 진행하는 카드 */
-.quiz-flow{ min-height:210px; }
+.quiz-flow{ min-height:210px; scroll-margin-top:14px; }
 .q-card{ border-top:0; padding:2px 0 0; }
 .q-card .q-text{ display:block; }
 .q-step{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 14px; }
 .q-pill{ font-family:var(--round); font-size:.92rem; color:#fff; background:var(--accent); border-radius:999px; padding:5px 15px; }
 .q-pill.think-pill{ background:var(--accent2); }
 .q-count{ font-family:var(--round); color:var(--body); font-size:.95rem; white-space:nowrap; }
-.q-nav{ display:flex; justify-content:center; margin-top:20px; }
+.q-nav{ display:flex; justify-content:center; margin-top:20px; scroll-margin-bottom:14px; }
 .q-nav.center{ justify-content:center; }
 .choice:disabled{ opacity:1; cursor:default; }
 .choice.picked{ border-color:var(--ink); background:#fff3d6; box-shadow:inset 0 0 0 1px var(--ink); }
