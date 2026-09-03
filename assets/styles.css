@@ -335,10 +335,13 @@ body{ margin:0; font-family:var(--sans); font-size:calc(16px*var(--font-scale));
    여기서는 이 사이트의 색만 넘긴다. 고칠 곳은 f:/VibeCoding/mattolab-brand/brand.css.
    .lab이 이 사이트에서는 곧 <footer>라 자리 잡기도 여기서 한다. */
 .lab{
-  --lab-wrap:1148px;
+  /* 이 사이트에서 푸터는 .paper 안에 있다. .paper가 이미 좌우 여백을 주므로
+     공용 brand.css의 wrap(가운데 정렬 + 좌우 22px)을 끈다. 안 끄면 Contact 열이
+     기사 오른쪽 끝에서 110px 왼쪽으로 밀린다(88px 폭 제한 + 22px 패딩). */
+  --lab-wrap:none;
   --lab-ink:var(--body); --lab-dim:var(--ink-3); --lab-line:rgba(0,0,0,.16);
   --lab-hi:var(--hi); --lab-key:#8A857A; --lab-soft:#948C7B; --lab-soon:#A9A396;
   --lab-sans:var(--sans); --lab-focus:var(--accent);
-  position:relative; z-index:6; margin:28px 4px 0; padding-top:16px;
+  position:relative; z-index:6; margin:28px 0 0; padding:16px 0 0;
   border-top:1px solid rgba(0,0,0,.10);
 }
