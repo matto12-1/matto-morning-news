@@ -18,6 +18,11 @@ export const PRODUCTS = [
     desc: "초등 1~6학년 · 평일 연재",
     url: "https://matto12-1.github.io/matto-morning-news/",
   },
+  {
+    name: "이야기 한국사",
+    desc: "초등 5·6학년 · 하루 세 편",
+    url: "https://daily-history-ebon.vercel.app/app.html",
+  },
 ];
 
 export const LAB_TAGLINE = "선생님이 만드는 교실 도구";
