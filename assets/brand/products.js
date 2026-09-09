@@ -20,7 +20,7 @@ export const PRODUCTS = [
   },
   {
     name: "이야기 한국사",
-    desc: "초등 5·6학년 · 하루 세 편",
+    desc: "초등 5·6학년 · 하루 두 편",
     url: "https://daily-history-ebon.vercel.app/app.html",
   },
 ];
