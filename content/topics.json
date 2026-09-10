@@ -1,6 +1,6 @@
 {
-  "_comment": "발행 이력 + 다음 순번. 나이틀리 잡이 rotation[nextIndex]로 대주제를 정하고, 발행 후 published에 추가하며 nextIndex를 (nextIndex+1)%rotation.length로 갱신한다. 아래 6편은 런칭 세트(수동 제작).",
-  "nextIndex": 22,
+  "_comment": "발행 이력 + 다음 순번. 나이틀리 잡이 rotation[nextIndex]로 대주제를 정하고, 발행 후 published에 추가하며 nextIndex=(nextIndex+1)%rotation.length로 갱신한다. published 항목의 slot = 그 편이 쓴 rotation 인덱스(51호부터 기록) — 큐를 재편해도 포인터 정합을 확인할 수 있게 하는 값이다. 이름으로 대조하지 말 것.",
+  "nextIndex": 4,
   "published": [
     {
       "date": "2026-07-23",
@@ -81,7 +81,7 @@
       "date": "2026-07-30",
       "issueNo": 6,
       "category": "history",
-      "badgeLabel": "우리 문화유산",
+      "badgeLabel": "우리 문화유산·명절",
       "emoji": "🏛",
       "title": "옛날 사람들은 시간을 어떻게 알았을까?",
       "keywords": [
@@ -751,6 +751,326 @@
         "악기",
         "멜로디"
       ]
+    },
+    {
+      "date": "2026-10-01",
+      "issueNo": 51,
+      "category": "science",
+      "badgeLabel": "우리 몸·건강",
+      "emoji": "🫀",
+      "title": "감기는 왜 걸릴까?",
+      "keywords": [
+        "바이러스",
+        "면역",
+        "환절기",
+        "재채기",
+        "점막"
+      ],
+      "slot": 48
+    },
+    {
+      "date": "2026-10-02",
+      "issueNo": 52,
+      "category": "history",
+      "badgeLabel": "우리 문화유산·명절",
+      "emoji": "🎎",
+      "title": "개천절, 하늘이 열린 날",
+      "keywords": [
+        "국경일",
+        "신화",
+        "고조선",
+        "태극기",
+        "삼국유사"
+      ],
+      "slot": 49
+    },
+    {
+      "date": "2026-10-06",
+      "issueNo": 53,
+      "category": "literature",
+      "badgeLabel": "세계 명작·고전",
+      "emoji": "📚",
+      "title": "피노키오, 거짓말하면 코가 길어진다고?",
+      "keywords": [
+        "핑계",
+        "사고뭉치",
+        "뉘우치다",
+        "정직",
+        "상징"
+      ],
+      "slot": 50
+    },
+    {
+      "date": "2026-10-07",
+      "issueNo": 54,
+      "category": "society",
+      "badgeLabel": "미디어 읽기",
+      "emoji": "📰",
+      "title": "광고는 왜 자꾸 사고 싶게 만들까?",
+      "keywords": [
+        "광고",
+        "장점",
+        "충동",
+        "소비",
+        "설득"
+      ],
+      "slot": 51
+    },
+    {
+      "date": "2026-10-08",
+      "issueNo": 55,
+      "category": "language",
+      "badgeLabel": "낱말의 유래",
+      "emoji": "🔤",
+      "title": "'한글'이라는 이름은 누가 지었을까?",
+      "keywords": [
+        "언문",
+        "세월",
+        "국문",
+        "으뜸",
+        "국어학자"
+      ],
+      "slot": 52
+    },
+    {
+      "date": "2026-10-12",
+      "issueNo": 56,
+      "category": "mind",
+      "badgeLabel": "생각하는 힘",
+      "emoji": "🤔",
+      "title": "똑같이 나누면 늘 공평할까?",
+      "keywords": [
+        "균등",
+        "공평",
+        "발판",
+        "사정",
+        "배분"
+      ],
+      "slot": 53
+    },
+    {
+      "date": "2026-10-13",
+      "issueNo": 57,
+      "category": "tech",
+      "badgeLabel": "수와 퍼즐",
+      "emoji": "🔢",
+      "title": "만, 억, 조… 큰 수는 얼마나 클까?",
+      "keywords": [
+        "짐작",
+        "헤아리다",
+        "단위",
+        "쉼표",
+        "체계"
+      ],
+      "slot": 54
+    },
+    {
+      "date": "2026-10-14",
+      "issueNo": 58,
+      "category": "art",
+      "badgeLabel": "공연·무용",
+      "emoji": "🩰",
+      "title": "탈춤, 탈을 쓰면 무엇이 달라질까?",
+      "keywords": [
+        "탈",
+        "재담",
+        "마당",
+        "추임새",
+        "풍자"
+      ],
+      "slot": 55
+    },
+    {
+      "date": "2026-10-15",
+      "issueNo": 59,
+      "category": "science",
+      "badgeLabel": "환경·생태",
+      "emoji": "🌍",
+      "title": "꿀벌이 사라지면 어떻게 될까?",
+      "keywords": [
+        "꽃가루",
+        "열매",
+        "농약",
+        "기후",
+        "수분"
+      ],
+      "slot": 56
+    },
+    {
+      "date": "2026-10-16",
+      "issueNo": 60,
+      "category": "history",
+      "badgeLabel": "지리·지도",
+      "emoji": "🗺",
+      "title": "세계에서 가장 큰 나라, 가장 작은 나라",
+      "keywords": [
+        "면적",
+        "국경",
+        "시차",
+        "인구",
+        "영토"
+      ],
+      "slot": 57
+    },
+    {
+      "date": "2026-10-19",
+      "issueNo": 61,
+      "category": "literature",
+      "badgeLabel": "시와 노랫말",
+      "emoji": "🖋",
+      "title": "시는 왜 줄을 바꿀까?",
+      "keywords": [
+        "행갈이",
+        "리듬",
+        "반복",
+        "빗대다",
+        "여백"
+      ],
+      "slot": 58
+    },
+    {
+      "date": "2026-10-20",
+      "issueNo": 62,
+      "category": "society",
+      "badgeLabel": "법과 규칙",
+      "emoji": "⚖️",
+      "title": "학교 앞 노란 길, 스쿨존 이야기",
+      "keywords": [
+        "보호구역",
+        "횡단보도",
+        "서행",
+        "표지판",
+        "제동거리"
+      ],
+      "slot": 59
+    },
+    {
+      "date": "2026-10-21",
+      "issueNo": 63,
+      "category": "language",
+      "badgeLabel": "헷갈리는 말",
+      "emoji": "✏️",
+      "title": "'다르다'와 '틀리다'는 달라요",
+      "keywords": [
+        "다르다",
+        "틀리다",
+        "구별",
+        "취향",
+        "가르치다"
+      ],
+      "slot": 60
+    },
+    {
+      "date": "2026-10-22",
+      "issueNo": 64,
+      "category": "mind",
+      "badgeLabel": "습관과 도전",
+      "emoji": "🌱",
+      "title": "매일 조금씩 하면 무슨 일이 생길까?",
+      "keywords": [
+        "습관",
+        "꾸준히",
+        "되풀이",
+        "뿌듯하다",
+        "지속"
+      ],
+      "slot": 61
+    },
+    {
+      "date": "2026-10-23",
+      "issueNo": 65,
+      "category": "tech",
+      "badgeLabel": "로봇·기계",
+      "emoji": "⚙️",
+      "title": "로봇은 어떻게 움직일까?",
+      "keywords": [
+        "로봇",
+        "센서",
+        "신호",
+        "모터",
+        "제어"
+      ],
+      "slot": 62
+    },
+    {
+      "date": "2026-10-26",
+      "issueNo": 66,
+      "category": "art",
+      "badgeLabel": "건축·디자인",
+      "emoji": "📐",
+      "title": "높은 건물은 왜 안 넘어질까?",
+      "keywords": [
+        "기초",
+        "기둥",
+        "뼈대",
+        "무게중심",
+        "하중"
+      ],
+      "slot": 63
+    },
+    {
+      "date": "2026-10-27",
+      "issueNo": 67,
+      "category": "science",
+      "badgeLabel": "과학·자연",
+      "emoji": "🔬",
+      "title": "나뭇잎은 왜 빨갛게 물들까?",
+      "keywords": [
+        "단풍",
+        "잎자루",
+        "떨켜",
+        "일교차",
+        "엽록소"
+      ],
+      "slot": 0
+    },
+    {
+      "date": "2026-10-28",
+      "issueNo": 68,
+      "category": "history",
+      "badgeLabel": "역사·사건",
+      "emoji": "🏛",
+      "title": "거북선, 바다를 지킨 배",
+      "keywords": [
+        "수군",
+        "덮개",
+        "노",
+        "물길",
+        "판옥선"
+      ],
+      "slot": 1
+    },
+    {
+      "date": "2026-10-29",
+      "issueNo": 69,
+      "category": "literature",
+      "badgeLabel": "문학·이야기",
+      "emoji": "📖",
+      "title": "금도끼 은도끼, 왜 하필 세 번일까?",
+      "keywords": [
+        "나무꾼",
+        "되풀이",
+        "후렴",
+        "전래동화",
+        "구전"
+      ],
+      "slot": 2
+    },
+    {
+      "date": "2026-10-30",
+      "issueNo": 70,
+      "category": "society",
+      "badgeLabel": "사회·경제",
+      "emoji": "💰",
+      "title": "용돈은 어떻게 쓰는 게 좋을까?",
+      "keywords": [
+        "용돈",
+        "저금",
+        "후회",
+        "계획",
+        "충동"
+      ],
+      "slot": 3
     }
   ]
 }

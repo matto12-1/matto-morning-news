@@ -14,23 +14,32 @@ export function categoryTheme(category) {
   const CAT = {
     science: "science and nature",
     history: "history and culture",
-    literature: "a gentle storybook scene",
+    literature: "a gentle storybook scene or a poem",
     tech: "technology and invention",
     society: "everyday society and life",
-    art: "art and music",
+    // 2026-09-10: "art and music"이라고만 주면 계열 전체가 음악으로 끌려간다 — 건축 기사에
+    // 음악회 그림이 나왔다. 계열은 넓게만 알려 주고, 무엇을 그릴지는 아래 concept 줄이 정한다.
+    art: "the arts — this may be visual art, music, performance, or architecture; follow the concept below rather than assuming",
     mind: "feelings and a mindful heart",
     language: "Korean words and expressions",
   };
   return CAT[category] || "learning";
 }
 
+// 2026-09-10: 주제 자체가 '글자'인 기사(한글·낱말·시·큰 수 등)는 제목을 개념으로 넘기는 것만으로도
+// 모델이 문자를 그린다 — 55호(한글 이름)에서 2026-08-07과 똑같이 깨진 한글 제목이 박혀 나왔다.
+// 그런 편은 기사 JSON에 `imageConcept`(영어, 그릴 장면을 직접 서술)을 넣어 제목 대신 쓰게 한다.
 export function buildImagePrompt(a) {
   const theme = categoryTheme(a.category);
+  // 2026-09-10: 이 신문 제목은 대개 물음표로 끝난다. 그 제목을 개념으로 넘기면 모델이 물음표를
+  // 글리프로 그려 넣는다(10-12·10-21에서 실제로 나왔다). 개념에서 물음표·느낌표를 걷어낸다.
+  const strip = (s) => String(s).replace(/[?!？！]/g, "").replace(/\s{2,}/g, " ").trim();
+  const concept = a.imageConcept || strip(`${a.title}${a.subtitle ? " — " + a.subtitle : ""}`);
   return (
     `Editorial illustration for a warm Korean children's magazine, for elementary students (ages 9-12). ` +
     `Theme: ${theme}. ` +
     // 제목을 따옴표로 그대로 인용하지 않는다 — 대신 "무엇을 그려야 하는지"를 개념으로 풀어서 전달.
-    `Core concept to depict visually (do NOT spell out or write this as text — express it only through the scene, objects, and characters' actions/expressions): ${a.title}${a.subtitle ? " — " + a.subtitle : ""}. ` +
+    `Core concept to depict visually (do NOT spell out or write this as text — express it only through the scene, objects, and characters' actions/expressions): ${concept}. ` +
     `The illustration must clearly and specifically relate to this concept — avoid a generic pretty scene that could fit any topic; a reader should recognize the topic from the imagery alone. ` +
     `Style: friendly flat-vector storybook illustration with soft grain texture, bright but gentle pastel colors, ` +
     `cozy and clean, one clear central subject, simple uncluttered background, soft warm lighting. ` +

@@ -21,10 +21,12 @@
    - `date` = 오늘(KST). `issueNo` = `index.json` 길이 + 1.
    - `category` = `slot.theme`. `categoryLabel` = `slot.categoryLabel`. `badgeLabel` = `slot.domain`.
 6. `content/YYYY-MM-DD.json`으로 저장.
-7. 이력 갱신: `index.json`에 날짜 추가 / `topics.json`의 `published` 추가 + `nextIndex = (nextIndex+1) % rotation.length`.
+7. 이력 갱신: `index.json`에 날짜 추가 / `topics.json`의 `published`에 항목 추가 + `nextIndex = (nextIndex+1) % rotation.length`.
+   - **`published` 항목에 `slot`(= 이번에 쓴 rotation 인덱스)을 반드시 같이 적는다.** 포인터 정합 검사가 대주제 이름이 아니라 이 숫자로 대조한다(큐를 재편해 이름이 바뀌어도 안 깨지게 하려는 것 — 2026-09-09 결정 대장 참고).
 8. **검증:** `node tools/validate.mjs content/YYYY-MM-DD.json` → `OK`. 또 아래 분량을 확인:
    - `node -e "const a=require('./content/YYYY-MM-DD.json');const s=x=>String(x).replace(/\\s/g,'').length;for(const k of ['sprout','lower','upper'])console.log(k,s(a.body[k].map(t=>t.text).join('')))"`
    - sprout 380~450 / lower 700~1000 / upper 1300~1500 범위여야 한다. 실패 시 최대 3회 재시도.
+   - 마지막으로 `npm test` → 전부 통과. `tools/archive.test.mjs`가 index↔파일↔이력↔`nextIndex` 정합을 잡는다. 여기서 빨간불이 나면 **커밋하지 말고** 어긋난 곳을 고친다.
 9. `git add content/ && git commit -m "content: issue YYYY-MM-DD (<대주제> — <소주제>)" && git push` → 자동 배포.
 
 ---
@@ -39,6 +41,12 @@
 ### 본문 — 세 단계 (`body.sprout` / `body.lower` / `body.upper`)
 세 단계는 같은 주제를 **각 학년 눈높이로 새로 쓴** 글이다(문장 재사용 금지). 어조는 따뜻한 존댓말, 질문으로 시작.
 
+> **문체 — 해요체가 기본이다 (2026-09-10 검수에서 깨졌던 것)**
+> - 서술은 `~해요 / ~이에요 / ~지요`. 이야기체 `~랍니다 / ~답니다`는 이 신문의 목소리이니 **자유롭게 써도 된다.**
+> - 딱딱한 합쇼체 `~습니다 / ~합니다 / ~됩니다 / ~봅시다`는 **쓰지 않는다.** 기존 50편에 편당 0~4건뿐이던 것이 병렬 집필에서 편당 최대 33건으로 늘어 전 편을 다시 고쳤다. 5·6학년 설명문이라도 해요체로 쓴다.
+> - `npm test`의 `archive.test.mjs`가 편당 5문장을 넘으면 실패시킨다.
+> - **학년 간 문장 재사용**은 합니다체를 해요체로 고치는 과정에서도 생긴다(두 학년의 비슷한 문장이 똑같아진다). 고친 뒤 한 번 더 확인할 것.
+
 | 단계 | 키 | 분량(공백 제외) | 섹션 | 특징 |
 |---|---|---|---|---|
 | **1·2학년** | `body.sprout` | **380~450자** | 2~3개 | 한 문장에 생각 하나. 아주 쉬운 말. 어려운 한자어·추상어 금지. 구체적 장면·비유 위주. |
@@ -52,6 +60,12 @@
 - **8개.** 앞 4개는 `body.lower`에 등장(저학년 밑줄 4), 뒤 4개는 `body.upper`에만 등장(고학년 밑줄 7~8). 각 항목 `{ word, meaning(마침표로 끝), example }`.
 - 앱이 각 단계 본문에 실제 등장하는 낱말만 자동 밑줄·팝업·선긋기 문제로 만든다. (sprout는 자연히 1~2개만 밑줄.)
 
+> **낱말 밑줄 — 실제로 뜨는지 세어 볼 것 (2026-09-10 검수에서 깨졌던 것)**
+> 앱은 본문에 `vocab.word`가 **글자 그대로** 있어야만 밑줄을 친다. 그러니:
+> - **upper 본문에는 8낱말이 전부(최소 7개) 나와야 한다.** 앞 4개도 upper에 다시 나와야 한다는 뜻이다. "뒤 4개는 upper에만"만 지키고 앞 4개를 upper에 안 넣으면 밑줄이 4~5개로 떨어진다(실제로 평균 7.9 → 6.6으로 떨어졌었다).
+> - **기본형 그대로** 넣어야 매칭된다. '뉘우쳐'는 '뉘우치다'에 안 걸린다. 활용형만 자연스러운 낱말이면 **다른 낱말로 바꿔라**(명사가 안전하다).
+> - 기본형을 억지로 끼울 때는 따옴표로 묶어 낱말 제시임을 드러낸다: `이것을 '빗대다'라고 해요` (따옴표 없으면 "빗대다라고"가 한 덩어리로 읽힌다).
+
 ### 퀴즈 — 학년별 분리
 `quiz.comprehension = { "sprout":[...], "lower":[5문항], "upper":[5문항] }`
 
@@ -59,6 +73,12 @@
 - **lower 5문항 유형 순서: mc, ox, mc, ox, cloze**
 - **upper 5문항 유형 순서: mc, multi, ox, order, mc** (더 어렵게)
 - 필드: `mc{choices[3~4],answerIndex}` · `ox{answer:boolean}` · `cloze{acceptable[]}` · `multi{choices[4],answerIndexes[]}` · `order{steps[]}`. 전부 `explain` 필수.
+- **퀴즈를 쓴 뒤 직접 풀어 보고 대조할 것** (2026-09-10 검수에서 70문항 중 여러 건이 걸렸다):
+  - `cloze`의 `acceptable`은 **빈칸에 넣어 문장이 성립하는 값만.** `"하루 ___ 줄"`에 `"다섯 줄"`, `"___(이)라고"`에 `"재담이라고"`를 넣으면 말이 겹친다 — 아이가 틀린 형태를 써도 정답 처리된다. 빈칸은 **한 문항에 하나만.**
+  - `cloze` 정답이 **다른 vocab 낱말의 뜻풀이와 겹치지 않게** 문항을 좁혀라(70호: 문항이 '예산' 뜻과 같은데 정답은 '계획'이었다).
+  - `order`의 단계는 **본문에 적힌 순서에서 유일하게 정해져야** 한다. 선후가 모호한 두 단계가 있으면 하나로 합쳐라.
+  - **학년끼리 서로 모순되면 안 된다.** 69호는 3·4학년 OX가 "달라지는 것은 도끼의 종류뿐"이라 했는데 같은 호 5·6학년 본문은 "세 번째에 대답이 달라지는 것"이 핵심이었다. 형제자매가 다른 학년 판을 같이 읽는다.
+  - **factbox와 본문의 수치가 일치해야** 한다(62호: factbox는 시속 30km를 "어른 달리기의 서너 배", 본문은 "조금 빠르다" — 본문이 맞았다).
 - `quiz.vocab` = 최소 2문항(스키마 검증용): `{type:"meaning"|"cloze",...}`.
 
 ### 생각 넓히기 (`quiz.think`) — 기본 + 1·2학년 override

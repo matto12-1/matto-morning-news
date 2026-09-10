@@ -18,7 +18,13 @@ async function genOne(a) {
   for (let attempt = 1; attempt <= 4; attempt++) {
     try {
       const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
-      if (res.status === 429 || res.status >= 500) { await sleep(attempt * 8000); continue; }
+      // 조용히 재시도하면 왜 실패했는지가 로그에 한 줄도 안 남는다 — 2026-09-10에 월 지출 상한
+      // 초과(429 RESOURCE_EXHAUSTED)를 레이트리밋으로 착각해 한참 헤맸다. 이유를 반드시 찍는다.
+      if (res.status === 429 || res.status >= 500) {
+        console.error(a.date, "HTTP", res.status, (await res.text()).replace(/\s+/g, " ").slice(0, 200));
+        await sleep(attempt * 8000);
+        continue;
+      }
       const j = await res.json();
       if (!res.ok) { console.error(a.date, "HTTP", res.status, JSON.stringify(j).slice(0, 200)); await sleep(3000); continue; }
       const part = (j?.candidates?.[0]?.content?.parts || []).find((p) => p.inlineData || p.inline_data);
