@@ -10,9 +10,10 @@
 #
 # Keep this file ASCII-only: Windows PowerShell 5.1 reads BOM-less .ps1 as ANSI and mangles non-ASCII.
 #
-# Manual:  powershell -NoProfile -ExecutionPolicy Bypass -File tools\monthly-run.ps1          (acts only on days 1-5)
-#          powershell -NoProfile -ExecutionPolicy Bypass -File tools\monthly-run.ps1 -Smoke   (any day: 2 issues, draft PR)
-param([switch]$Smoke)
+# Manual:  powershell -NoProfile -ExecutionPolicy Bypass -File tools\monthly-run.ps1                  (acts only on days 1-5)
+#          powershell -NoProfile -ExecutionPolicy Bypass -File tools\monthly-run.ps1 -Month 2026-11   (any day, that month)
+#          powershell -NoProfile -ExecutionPolicy Bypass -File tools\monthly-run.ps1 -Smoke           (any day: 2 issues, draft PR)
+param([switch]$Smoke, [string]$Month)
 
 $ErrorActionPreference = 'Continue'
 $Repo   = 'F:\VibeCoding\morningNEWs'
@@ -23,9 +24,20 @@ $Claude = "$env:USERPROFILE\.local\bin\claude.exe"
 $GhRepo = 'matto12-1/matto-morning-news'
 
 $now = [DateTime]::UtcNow.AddHours(9)                          # KST
-if (-not $Smoke -and $now.Day -gt 5) { exit 0 }                # quiet no-op outside days 1-5
+if (-not $Smoke -and -not $Month -and $now.Day -gt 5) { exit 0 }   # quiet no-op outside days 1-5
 
-$target = $now.AddMonths(1).ToString('yyyy-MM')
+# What is already published on origin/master (index.json is a flat array of 'YYYY-MM-DD').
+& git -C $Repo fetch origin --prune 2>&1 | Out-Null
+$json  = (& git -C $Repo show origin/master:content/index.json 2>$null) -join ''
+$dates = @($json.Trim().Trim('[', ']').Split(',') | ForEach-Object { $_.Trim().Trim('"') } | Where-Object { $_ -match '^\d{4}-\d{2}-\d{2}$' })
+
+# Target month. Scheduled run: next calendar month (run on the 1st -> the month after).
+# Smoke: the month after the last published one - a calendar "next month" on Sept 10 was October, which
+# was already published, and the first smoke test started rebuilding it (2026-09-10).
+if ($Month) { $target = $Month }
+elseif ($Smoke) { $target = [DateTime]::ParseExact(($dates[-1]).Substring(0, 7) + '-01', 'yyyy-MM-dd', $null).AddMonths(1).ToString('yyyy-MM') }
+else { $target = $now.AddMonths(1).ToString('yyyy-MM') }
+if ($target -notmatch '^\d{4}-\d{2}$') { Write-Output "bad target month: $target"; exit 1 }
 $stamp  = $now.ToString('yyyyMMdd-HHmm')
 $branch = if ($Smoke) { "morning/smoke-$stamp" } else { "morning/$target" }
 $mode   = if ($Smoke) { 'test' } else { 'full' }
@@ -35,19 +47,28 @@ $Log = Join-Path $LogDir "morning-$target-$stamp.log"
 function Say($m) { $line = "$(Get-Date -f 'yyyy-MM-dd HH:mm:ss') $m"; Add-Content -LiteralPath $Log -Value $line -Encoding UTF8; Write-Output $line }
 [Console]::OutputEncoding = [Text.Encoding]::UTF8             # claude/git/gh print UTF-8
 
-Say "start target=$target branch=$branch mode=$mode"
+Say "start target=$target branch=$branch mode=$mode (last published: $($dates[-1]))"
 
-# 1) A PR for this month already exists -> Matto's turn, nothing to do.
+# 1) Already on master (e.g. made by hand in a session) -> nothing to do. Never rebuild a published month.
+if (@($dates | Where-Object { $_.StartsWith("$target-") }).Count -gt 0) { Say "$target is already on master - nothing to do"; exit 0 }
+
+# 1b) A PR for this month already exists -> Matto's turn, nothing to do.
 if (-not $Smoke) {
   $prs = & gh pr list -R $GhRepo --head $branch --state all --json number,state 2>$null | ConvertFrom-Json
   if ($prs -and @($prs).Count -gt 0) { Say "PR already exists (#$(@($prs)[0].number) $(@($prs)[0].state)) - nothing to do"; exit 0 }
 }
 
 # 2) Worktree on the month's branch (resume if it already exists locally or on origin).
-& git -C $Repo fetch origin --prune 2>&1 | Out-Null
 if (Test-Path $Wt) {
   $cur = & git -C $Wt rev-parse --abbrev-ref HEAD 2>$null
-  if ($cur -ne $branch) { Say "removing stale worktree ($cur)"; & git -C $Repo worktree remove --force $Wt 2>&1 | ForEach-Object { Say $_ } }
+  if ($cur -ne $branch) {
+    Say "removing stale worktree ($cur)"
+    & git -C $Repo worktree remove --force $Wt 2>&1 | ForEach-Object { Say $_ }
+    # git can unregister the worktree yet fail to delete the folder (a locked file). A leftover folder
+    # would pass the checks below and be reused half-broken, so make sure it is really gone (2026-09-10).
+    if (Test-Path $Wt) { Remove-Item -LiteralPath $Wt -Recurse -Force -ErrorAction SilentlyContinue }
+    if (Test-Path $Wt) { Say "ERROR: cannot remove stale worktree folder $Wt"; exit 1 }
+  }
 }
 & git -C $Repo worktree prune 2>&1 | Out-Null
 if (-not (Test-Path $Wt)) {
