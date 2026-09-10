@@ -11,17 +11,17 @@ export const PRODUCTS = [
   {
     name: "매일 읽는 고전",
     desc: "초등 5·6학년 · 평일 연재",
-    url: "https://matto-daily-classics.vercel.app/",
+    url: "https://classics.matto.kr/",
   },
   {
     name: "마또의 아침신문",
     desc: "초등 1~6학년 · 평일 연재",
-    url: "https://matto12-1.github.io/matto-morning-news/",
+    url: "https://news.matto.kr/",
   },
   {
     name: "이야기 한국사",
     desc: "초등 5·6학년 · 하루 두 편",
-    url: "https://daily-history-ebon.vercel.app/app.html",
+    url: "https://history.matto.kr/",
   },
 ];
 
