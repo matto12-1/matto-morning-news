@@ -18,6 +18,9 @@ const files = fs.readdirSync(dir).filter((f) => f.startsWith(month + "-") && /^\
 if (!files.length) { console.error(`${month} 기사 파일이 없다`); process.exit(1); }
 
 const LEN = { sprout: [380, 450], lower: [700, 1000], upper: [1300, 1500] };
+// 이 달보다 앞선 발행 이력 — 같은 대주제 기존 편과의 겹침을 잴 때 쓴다
+const topics = JSON.parse(fs.readFileSync(new URL("topics.json", dir), "utf8"));
+const priorByDomain = (d) => topics.published.filter((p) => (p.badgeLabel || p.domain) === d && p.date < month + "-01");
 const bodyText = (a, lv) => (a.body?.[lv] || []).map((s) => s.text).join(" ");
 const sentences = (s) => s.split(/(?<=[.?!])\s+/).map((x) => x.trim()).filter(Boolean);
 const count = (s) => s.replace(/\s/g, "").length;
@@ -79,6 +82,17 @@ for (const f of files) {
   }
 
   if (needImages && !fs.existsSync(new URL(`img/${a.date}.jpg`, dir))) e.push("표지 그림 없음");
+
+  // 같은 대주제의 기존 편과 "같은 틀, 다른 낱말" — 2026-09-10 시험 실행이 #12 「'발이 넓다'는 무슨 뜻일까?」
+  // 바로 뒤에 「'손이 크다'는 무슨 뜻일까?」를 냈다. 글자 반복만 막으면 이게 통과한다.
+  //  ① 제목 틀: 따옴표 안 낱말을 지운 뼈대가 같으면 걸린다  ② 키워드(vocab 앞 5개)가 2개 이상 겹치면 걸린다
+  const skeleton = (t) => t.replace(/'[^']*'|"[^"]*"|‘[^’]*’|“[^”]*”/g, "○").replace(/[\s,.!?…]/g, "");
+  const kw = new Set(words.slice(0, 5));
+  for (const p of priorByDomain(a.badgeLabel)) {
+    if (skeleton(p.title) === skeleton(a.title)) e.push(`제목 틀이 #${p.issueNo} 「${p.title}」와 같다`);
+    const shared = (p.keywords || []).filter((k) => kw.has(k));
+    if (shared.length >= 2) e.push(`#${p.issueNo} 「${p.title}」와 키워드 ${shared.length}개 겹침(${shared.join(",")})`);
+  }
 
   if (e.length) failed++;
   console.log(`${e.length ? "▲" : "✔"} ${a.date} #${String(a.issueNo).padEnd(3)} ${`${lens.sprout}/${lens.lower}/${lens.upper}`.padEnd(16)} ${uHit}/8  ${String(stiff.length).padStart(3)}  ${String(dup.length).padStart(3)}  ${e.length ? e.join(" | ") : ""}`);
