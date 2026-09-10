@@ -20,3 +20,6 @@ graphify-out/
 
 # 인쇄 조판 검사(tools/check-print-fit.mjs)가 만드는 임시 렌더 파일
 tools/_fit.html
+
+# 월 배치 작업 메모(진행 기록·PR 본문) — 커밋하지 않는다
+.monthly/
