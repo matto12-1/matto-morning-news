@@ -27,11 +27,10 @@ export const PRODUCTS = [
 
 export const LAB_TAGLINE = "선생님이 만드는 교실 도구";
 
-// website는 아직 없어서 null이다. null이면 링크 대신 "준비 중이에요"가 옅게 뜬다.
-// 주소가 생기면 여기 한 줄만 채우면 전 사이트가 링크로 바뀐다.
+// website가 null이면 링크 대신 "준비 중이에요"가 옅게 뜬다. (2026-09-10 matto.kr 개설)
 export const CONTACT = {
   email: "wodb0410@gmail.com",
   instagram: "Matto__lab",
   indischool: "Matto",   // 링크 없이 이름만 (인디스쿨은 로그인해야 보이는 데가 많다)
-  website: null,
+  website: "https://matto.kr/",
 };

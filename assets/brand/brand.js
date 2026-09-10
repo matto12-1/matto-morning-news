@@ -46,7 +46,7 @@ export const labBlock = (siteName, { tag = "footer", withViews = true } = {}) =>
           ${row("Email", CONTACT.email, `mailto:${CONTACT.email}`)}
           ${row("Instagram", CONTACT.instagram && `@${CONTACT.instagram}`, CONTACT.instagram && `https://instagram.com/${CONTACT.instagram}`)}
           ${row("Indischool", CONTACT.indischool, null)}
-          ${row("Website", CONTACT.website, CONTACT.website)}
+          ${row("Website", CONTACT.website && CONTACT.website.replace(/^https?:\/\/|\/$/g, ""), CONTACT.website)}
         </div>
         ${withViews ? `<p class="views" hidden></p>` : ""}
       </div>
