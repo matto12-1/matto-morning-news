@@ -122,6 +122,13 @@ if (Test-Path '.monthly\DONE') {
   if ($Smoke) { $ghArgs += '--draft' }
   $url = & gh @ghArgs 2>&1
   Say "PR: $url"
+  # 6) Lineup note into today's Obsidian journal, so Matto can check the titles in the vault (2026-09-11).
+  #    Only for a real run, and only once the PR really exists.
+  if (-not $Smoke -and ("$url" -match 'https://github\.com/\S+/pull/\d+') -and (Test-Path '.monthly\VAULT_NOTE.md')) {
+    $prLink = $Matches[0]
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Repo 'tools\vault-note.ps1') `
+      -NoteFile (Join-Path $Wt '.monthly\VAULT_NOTE.md') -PrUrl $prLink -Marker "mn-batch:$target" 2>&1 | ForEach-Object { Say $_ }
+  }
 } else {
   Say 'not finished (no .monthly/DONE) - the next scheduled run resumes from file state'
 }
